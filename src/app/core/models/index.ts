@@ -9,7 +9,6 @@ export interface MainScope {
 export interface PaymentSplit {
   personName: string;
   amount: number;
-  currency: 'EGP' | 'USD';
 }
 
 export interface PaymentAttachment {
@@ -27,9 +26,7 @@ export interface Payment {
   subScope: string;
   date: Date;
   receivedEGP: number;
-  receivedUSD: number;
   mineEGP: number;
-  mineUSD: number;
   others: PaymentSplit[];
   godAmount: number;
   godPercentage: number;
@@ -92,9 +89,7 @@ export interface UserProfile {
 
 export interface DashboardStats {
   totalReceivedEGP: number;
-  totalReceivedUSD: number;
   totalMineEGP: number;
-  totalMineUSD: number;
   totalGodMoney: number;
   totalGodDisbursed: number;
   godMoneyBalance: number;

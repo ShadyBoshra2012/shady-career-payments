@@ -186,7 +186,7 @@ export class DashboardComponent implements OnInit {
 
   loading = true;
   stats: DashboardStats = {
-    totalReceivedEGP: 0, totalReceivedUSD: 0, totalMineEGP: 0, totalMineUSD: 0,
+    totalReceivedEGP: 0, totalMineEGP: 0,
     totalGodMoney: 0, totalGodDisbursed: 0, godMoneyBalance: 0,
     totalSalariesPaid: 0, projectCount: 0, employeeCount: 0,
   };

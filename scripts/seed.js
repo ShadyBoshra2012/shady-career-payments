@@ -24,8 +24,7 @@ function parseOthers(str) {
       const [name, rest] = line.split('=').map((s) => s.trim());
       const amountMatch = rest?.match(/[\d.]+/);
       const amount = amountMatch ? parseFloat(amountMatch[0]) : 0;
-      const currency = rest?.toUpperCase().includes('USD') ? 'USD' : 'EGP';
-      return { personName: name, amount, currency };
+      return { personName: name, amount };
     });
 }
 
@@ -83,9 +82,7 @@ async function seedCareerPayments() {
     if (currentMainScope) scopeNames.add(currentMainScope);
 
     const receivedEGP = parseFloat(r['Received (EGP)']) || 0;
-    const receivedUSD = r['Received (USD)'] && r['Received (USD)'] !== '-' ? parseFloat(r['Received (USD)']) || 0 : 0;
     const mineEGP = parseFloat(r['Mine (EGP)']) || 0;
-    const mineUSD = r['Mine (USD)'] && r['Mine (USD)'] !== '-' ? parseFloat(r['Mine (USD)']) || 0 : 0;
     const godAmount = parseFloat(r['God']) || 0;
     const godPercentage = receivedEGP > 0 ? Math.round((godAmount / receivedEGP) * 10000) / 100 : 0;
 
@@ -97,9 +94,7 @@ async function seedCareerPayments() {
       subScope: String(r['Sub Scope'] || ''),
       date: date ? admin.firestore.Timestamp.fromDate(date) : null,
       receivedEGP,
-      receivedUSD,
       mineEGP,
-      mineUSD,
       others: parseOthers(r['Other']),
       godAmount,
       godPercentage,

@@ -4,19 +4,67 @@ const path = require('path');
 const PROJECT_ID = 'shady-career-payments';
 const BASE_URL = `https://firestore.googleapis.com/v1/projects/${PROJECT_ID}/databases/(default)/documents`;
 
-// Excel serial date to ISO string
-function excelDateToISO(val) {
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+// Convert an Excel serial number to a JS Date
+function excelSerialToDate(serial) {
+  return new Date(Math.round((serial - 25569) * 86400 * 1000));
+}
+
+// Parse dd/MM/yyyy string to Date
+function parseDDMMYYYY(str) {
+  const m = String(str).match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if (!m) return null;
+  return new Date(parseInt(m[3]), parseInt(m[2]) - 1, parseInt(m[1]));
+}
+
+// Robust date parsing: Date objects, serial numbers, dd/MM/yyyy, ISO strings
+function parseDate(val) {
   if (!val) return null;
-  if (val instanceof Date) return val.toISOString();
-  if (typeof val === 'number') {
-    const d = new Date(Math.round((val - 25569) * 86400 * 1000));
-    return d.toISOString();
-  }
-  if (typeof val === 'string' && val.trim()) {
-    const d = new Date(val);
-    return isNaN(d.getTime()) ? null : d.toISOString();
+  if (val instanceof Date) return isNaN(val.getTime()) ? null : val;
+  if (typeof val === 'number') return excelSerialToDate(val);
+  if (typeof val === 'string') {
+    const trimmed = val.trim();
+    if (!trimmed) return null;
+    // Try dd/MM/yyyy first
+    const ddmm = parseDDMMYYYY(trimmed);
+    if (ddmm) return ddmm;
+    // Fall back to JS Date constructor
+    const d = new Date(trimmed);
+    return isNaN(d.getTime()) ? null : d;
   }
   return null;
+}
+
+// Format a sub scope value: if it's a Date or serial number, format as "MMM yyyy"
+function formatSubScope(val) {
+  if (!val && val !== 0) return '';
+  if (val instanceof Date && !isNaN(val.getTime())) {
+    return `${MONTHS[val.getMonth()]} ${val.getFullYear()}`;
+  }
+  if (typeof val === 'number') {
+    // Check if it looks like an Excel serial date (range ~1900-2100)
+    if (val > 1 && val < 100000) {
+      const d = excelSerialToDate(val);
+      if (d.getFullYear() >= 1990 && d.getFullYear() <= 2100) {
+        return `${MONTHS[d.getMonth()]} ${d.getFullYear()}`;
+      }
+    }
+    return String(val);
+  }
+  return String(val).trim();
+}
+
+// Clean main scope name: extract first line, remove URLs
+function cleanScopeName(val) {
+  if (!val) return '';
+  const str = String(val).trim();
+  // Take first non-empty line that is NOT a URL
+  const lines = str.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+  for (const line of lines) {
+    if (!line.match(/^https?:\/\//i)) return line;
+  }
+  return lines[0] || str;
 }
 
 // Parse "Kero = 100 EGP\nEngy = 100 EGP"
@@ -29,8 +77,7 @@ function parseOthers(str) {
       const [name, rest] = line.split('=').map((s) => s.trim());
       const amountMatch = rest?.match(/[\d.]+/);
       const amount = amountMatch ? parseFloat(amountMatch[0]) : 0;
-      const currency = rest?.toUpperCase().includes('USD') ? 'USD' : 'EGP';
-      return { personName: name, amount, currency };
+      return { personName: name, amount };
     });
 }
 
@@ -77,19 +124,18 @@ async function firestoreRequest(method, urlPath, body) {
   return res.json();
 }
 
-async function createDoc(collection, data) {
-  const result = await firestoreRequest('POST', `/${collection}`, toFirestoreDoc(data));
-  // Extract doc ID from name like "projects/.../documents/collection/DOC_ID"
+async function createDoc(collectionName, data) {
+  const result = await firestoreRequest('POST', `/${collectionName}`, toFirestoreDoc(data));
   const name = result.name;
   return name.split('/').pop();
 }
 
-async function listDocs(collection) {
+async function listDocs(collectionName) {
   const docs = [];
   let pageToken = '';
   while (true) {
     const qs = pageToken ? `?pageToken=${pageToken}&pageSize=300` : '?pageSize=300';
-    const result = await firestoreRequest('GET', `/${collection}${qs}`);
+    const result = await firestoreRequest('GET', `/${collectionName}${qs}`);
     if (result.documents) docs.push(...result.documents);
     if (!result.nextPageToken) break;
     pageToken = result.nextPageToken;
@@ -98,7 +144,6 @@ async function listDocs(collection) {
 }
 
 async function deleteDoc(docName) {
-  // docName is full path from list
   const url = `https://firestore.googleapis.com/v1/${docName}`;
   const res = await fetch(url, { method: 'DELETE' });
   if (!res.ok && res.status !== 404) {
@@ -107,18 +152,17 @@ async function deleteDoc(docName) {
   }
 }
 
-async function deleteCollection(collection) {
-  const docs = await listDocs(collection);
+async function deleteCollection(collectionName) {
+  const docs = await listDocs(collectionName);
   if (docs.length === 0) {
-    console.log(`  ${collection}: already empty`);
+    console.log(`  ${collectionName}: already empty`);
     return;
   }
-  // Delete in parallel batches of 50
   for (let i = 0; i < docs.length; i += 50) {
     const batch = docs.slice(i, i + 50);
     await Promise.all(batch.map((d) => deleteDoc(d.name)));
   }
-  console.log(`  ${collection}: deleted ${docs.length} docs`);
+  console.log(`  ${collectionName}: deleted ${docs.length} docs`);
 }
 
 async function clearAll() {
@@ -133,7 +177,7 @@ async function clearAll() {
 
 async function seedCareerPayments() {
   const filePath = path.join(__dirname, '..', 'My Career Payments .xlsx');
-  const wb = XLSX.readFile(filePath);
+  const wb = XLSX.readFile(filePath, { cellDates: true });
 
   // --- Payments ---
   console.log('📄 Reading Payments sheet...');
@@ -144,29 +188,36 @@ async function seedCareerPayments() {
 
   let currentMainScope = '';
   const scopeNames = new Set();
+  const scopeNotes = {};
   const payments = [];
 
   for (const r of validPayments) {
-    if (r['Main Scope']) currentMainScope = String(r['Main Scope']).trim();
+    if (r['Main Scope']) {
+      const raw = String(r['Main Scope']);
+      const cleaned = cleanScopeName(raw);
+      currentMainScope = cleaned;
+      // If the raw value contained a URL, store it as notes for that scope
+      if (raw.includes('http')) {
+        const urlMatch = raw.match(/https?:\/\/[^\s]+/i);
+        if (urlMatch) scopeNotes[cleaned] = urlMatch[0];
+      }
+    }
     if (currentMainScope) scopeNames.add(currentMainScope);
 
     const receivedEGP = parseFloat(r['Received (EGP)']) || 0;
-    const receivedUSD = r['Received (USD)'] && r['Received (USD)'] !== '-' ? parseFloat(r['Received (USD)']) || 0 : 0;
     const mineEGP = parseFloat(r['Mine (EGP)']) || 0;
-    const mineUSD = r['Mine (USD)'] && r['Mine (USD)'] !== '-' ? parseFloat(r['Mine (USD)']) || 0 : 0;
     const godAmount = parseFloat(r['God']) || 0;
     const godPercentage = receivedEGP > 0 ? Math.round((godAmount / receivedEGP) * 10000) / 100 : 0;
-    const dateISO = excelDateToISO(r['Date']);
+    const date = parseDate(r['Date']);
+    const subScope = formatSubScope(r['Sub Scope']);
 
     payments.push({
       mainScopeId: '',
       mainScopeName: currentMainScope,
-      subScope: String(r['Sub Scope'] || ''),
-      date: dateISO ? new Date(dateISO) : null,
+      subScope,
+      date,
       receivedEGP,
-      receivedUSD,
       mineEGP,
-      mineUSD,
       others: parseOthers(r['Other']),
       godAmount,
       godPercentage,
@@ -183,7 +234,7 @@ async function seedCareerPayments() {
   for (const name of scopeNames) {
     const id = await createDoc('mainScopes', {
       name,
-      notes: '',
+      notes: scopeNotes[name] || '',
       createdAt: new Date(),
       updatedAt: new Date(),
     });
@@ -191,6 +242,7 @@ async function seedCareerPayments() {
   }
 
   // Write payments (in batches of 20 parallel)
+  // Store mainScopeName for convenience (used in UI filtering/display)
   console.log(`📝 Writing ${payments.length} payments...`);
   for (let i = 0; i < payments.length; i += 20) {
     const batch = payments.slice(i, i + 20);
@@ -207,23 +259,31 @@ async function seedCareerPayments() {
   // --- GODs Money ---
   console.log('\n📄 Reading GODs Money sheet...');
   const godsRows = XLSX.utils.sheet_to_json(wb.Sheets['GODs Money']);
-  const validGods = godsRows.filter((r) => r['Responsible to'] || r['Title']);
+  // Filter: must have a valid # (number) AND at least Title or Responsible to
+  const validGods = godsRows.filter((r) => {
+    const num = r['#'];
+    if (num === undefined || num === null || num === '' || String(num).toLowerCase() === 'total') return false;
+    const isNumeric = (typeof num === 'number' && num > 0) || (!isNaN(parseInt(String(num))) && parseInt(String(num)) > 0);
+    if (!isNumeric) return false;
+    // Must also have at least Title or Responsible to
+    return (r['Title'] && String(r['Title']).trim()) || (r['Responsible to'] && String(r['Responsible to']).trim());
+  });
 
   console.log(`📝 Writing ${validGods.length} God's Money entries...`);
   for (let i = 0; i < validGods.length; i += 20) {
     const batch = validGods.slice(i, i + 20);
     await Promise.all(
       batch.map((r) => {
-        const sendDate = excelDateToISO(r['Sending Date']);
-        const execDate = excelDateToISO(r['Execution Date']);
+        const sendDate = parseDate(r['Sending Date']);
+        const execDate = parseDate(r['Execution Date']);
         return createDoc('godsMoney', {
           responsibleTo: String(r['Responsible to'] || ''),
           title: String(r['Title'] || ''),
           description: String(r['Desciption'] || ''),
           priceEGP: parseFloat(r['Price (EGP)']) || 0,
           proof: String(r['Proof'] || ''),
-          sendingDate: sendDate ? new Date(sendDate) : null,
-          executionDate: execDate ? new Date(execDate) : null,
+          sendingDate: sendDate,
+          executionDate: execDate,
           notes: '',
           attachments: [],
           createdAt: new Date(),
@@ -237,12 +297,13 @@ async function seedCareerPayments() {
 
 async function seedSalaries() {
   const filePath = path.join(__dirname, '..', 'BeLightTech Salaries.xlsx');
-  const wb = XLSX.readFile(filePath);
+  const wb = XLSX.readFile(filePath, { cellDates: true });
 
   // --- Employees ---
   console.log('\n📄 Reading Overview sheet (employees)...');
   const empRows = XLSX.utils.sheet_to_json(wb.Sheets['Overview']);
-  const validEmps = empRows.filter((r) => r['Name']);
+  // Filter: must have a non-empty Name
+  const validEmps = empRows.filter((r) => r['Name'] && String(r['Name']).trim());
 
   console.log(`📝 Writing ${validEmps.length} employees...`);
   const empIdMap = {};
@@ -266,7 +327,7 @@ async function seedSalaries() {
   // --- Salary Payments ---
   console.log('\n📄 Reading Accumlative sheet (salary payments)...');
   const salRows = XLSX.utils.sheet_to_json(wb.Sheets['20242025 Accumlative']);
-  const validSals = salRows.filter((r) => r['Name'] && r['Salary']);
+  const validSals = salRows.filter((r) => r['Name'] && String(r['Name']).trim() && r['Salary']);
 
   console.log(`📝 Writing ${validSals.length} salary payments...`);
   for (let i = 0; i < validSals.length; i += 20) {
@@ -274,12 +335,12 @@ async function seedSalaries() {
     await Promise.all(
       batch.map((r) => {
         const name = String(r['Name']).trim();
-        const dateISO = excelDateToISO(r['Date']);
+        const date = parseDate(r['Date']);
         return createDoc('salaryPayments', {
           employeeId: empIdMap[name] || '',
           employeeName: name,
           position: String(r['Position'] || ''),
-          date: dateISO ? new Date(dateISO) : null,
+          date,
           amount: parseFloat(r['Salary']) || 0,
           comments: String(r['Comments'] || ''),
           notes: '',
@@ -304,18 +365,7 @@ async function main() {
     console.log('\n🎉 All data seeded successfully!');
   } catch (err) {
     console.error('\n❌ Error:', err.message);
-    console.log('\n🔄 Clearing all collections and retrying after fix...');
-    try {
-      await clearAll();
-      console.log('🌱 Retrying: Seeding Career Payments...');
-      await seedCareerPayments();
-      console.log('\n🌱 Retrying: Seeding Salaries...');
-      await seedSalaries();
-      console.log('\n🎉 Retry succeeded! All data seeded.');
-    } catch (retryErr) {
-      console.error('\n❌ Retry also failed:', retryErr.message);
-      process.exit(1);
-    }
+    process.exit(1);
   }
 }
 

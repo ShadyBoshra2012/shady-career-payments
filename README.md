@@ -4,7 +4,7 @@ A comprehensive Angular 19 web application for managing career payments, salary 
 
 ## Features
 
-- **Payments Management** — Track all career/freelance payments with project scopes, dual currency (EGP/USD), payment splits, and God's Money allocation
+- **Payments Management** — Track all career/freelance payments with project scopes, payment splits, and God's Money allocation
 - **God's Money Tracking** — Full CRUD for charitable disbursements with balance computation (accumulated from payments minus disbursed)
 - **Employee Management** — Maintain a shared employee pool with position, salary, payment method, and account info
 - **Salary Payments** — Track monthly salary payments per employee with filtering and totals

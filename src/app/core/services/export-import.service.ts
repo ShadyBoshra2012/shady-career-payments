@@ -51,10 +51,8 @@ export class ExportImportService {
       'Sub Scope': p.subScope,
       Date: p.date ? new Date(p.date).toLocaleDateString() : '',
       'Received (EGP)': p.receivedEGP || 0,
-      'Received (USD)': p.receivedUSD || 0,
       'Mine (EGP)': p.mineEGP || 0,
-      'Mine (USD)': p.mineUSD || 0,
-      Others: p.others?.map((o) => `${o.personName} = ${o.amount} ${o.currency}`).join('\n') || '',
+      Others: p.others?.map((o) => `${o.personName} = ${o.amount} EGP`).join('\n') || '',
       'God Amount': p.godAmount || 0,
       'God %': p.godPercentage || 0,
       Notes: p.notes || '',
@@ -182,9 +180,7 @@ export class ExportImportService {
         subScope: String(r['Sub Scope'] || ''),
         date: r['Date'] ? new Date(String(r['Date'])) : new Date(),
         receivedEGP: Number(r['Received (EGP)']) || 0,
-        receivedUSD: Number(r['Received (USD)']) || 0,
         mineEGP: Number(r['Mine (EGP)']) || 0,
-        mineUSD: Number(r['Mine (USD)']) || 0,
         others: this.parseOthersString(String(r['Others'] || '')),
         godAmount: Number(r['God Amount']) || 0,
         godPercentage: Number(r['God %']) || 0,
@@ -249,7 +245,7 @@ export class ExportImportService {
     return data;
   }
 
-  private parseOthersString(str: string): { personName: string; amount: number; currency: 'EGP' | 'USD' }[] {
+  private parseOthersString(str: string): { personName: string; amount: number }[] {
     if (!str || str === '-' || str === 'undefined') return [];
     return str
       .split('\n')
@@ -257,8 +253,7 @@ export class ExportImportService {
       .map((line) => {
         const parts = line.split('=').map((s) => s.trim());
         const amountStr = parts[1]?.replace(/[^0-9.]/g, '') || '0';
-        const currency = parts[1]?.toUpperCase().includes('USD') ? 'USD' as const : 'EGP' as const;
-        return { personName: parts[0], amount: Number(amountStr), currency };
+        return { personName: parts[0], amount: Number(amountStr) };
       });
   }
 
@@ -284,7 +279,7 @@ export class ExportImportService {
 
   /**
    * Seed from the original "My Career Payments .xlsx" file.
-   * Sheet "Payments" has columns: #, MainScope, SubScope, ReceivedEGP, ReceivedUSD, MineEGP, MineUSD, Other, God, God%, Total, Date
+   * Sheet "Payments" has columns: #, MainScope, SubScope, ReceivedEGP, MineEGP, Other, God, God%, Total, Date
    * Sheet "GODs Money" has columns: #, Responsible To, Title, Description, Price EGP, Proof, Sending Date, Execution Date
    */
   async seedFromCareerPaymentsExcel(file: File): Promise<void> {
@@ -323,9 +318,7 @@ export class ExportImportService {
           subScope: String(r['SubScope'] || r['Sub Scope'] || r['subScope'] || ''),
           date: dateVal,
           receivedEGP,
-          receivedUSD: Number(r['ReceivedUSD'] || r['Received USD'] || r['receivedUSD'] || 0),
           mineEGP: Number(r['MineEGP'] || r['Mine EGP'] || r['mineEGP'] || 0),
-          mineUSD: Number(r['MineUSD'] || r['Mine USD'] || r['mineUSD'] || 0),
           others: this.parseOthersString(othersStr),
           godAmount: godAmt,
           godPercentage: godPct,

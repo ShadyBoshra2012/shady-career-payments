@@ -40,7 +40,7 @@ export class DataService {
 
   // Payments
   getPayments(): Observable<Payment[]> {
-    return this.fs.getCollectionAsc<Payment>('payments', 'date');
+    return this.fs.getCollection<Payment>('payments', 'date');
   }
 
   async addPayment(data: Partial<Payment>): Promise<string> {
@@ -64,7 +64,7 @@ export class DataService {
 
   // God's Money
   getGodsMoney(): Observable<GodsMoney[]> {
-    return this.fs.getCollectionAsc<GodsMoney>('godsMoney', 'sendingDate');
+    return this.fs.getCollection<GodsMoney>('godsMoney', 'sendingDate');
   }
 
   async addGodsMoney(data: Partial<GodsMoney>): Promise<string> {
@@ -112,7 +112,7 @@ export class DataService {
 
   // Salary Payments
   getSalaryPayments(): Observable<SalaryPayment[]> {
-    return this.fs.getCollectionAsc<SalaryPayment>('salaryPayments', 'date');
+    return this.fs.getCollection<SalaryPayment>('salaryPayments', 'date');
   }
 
   async addSalaryPayment(data: Partial<SalaryPayment>): Promise<string> {
@@ -145,18 +145,14 @@ export class DataService {
     ]).pipe(
       map(([payments, godsMoney, employees, salaries, scopes]) => {
         const totalReceivedEGP = payments.reduce((s, p) => s + (p.receivedEGP || 0), 0);
-        const totalReceivedUSD = payments.reduce((s, p) => s + (p.receivedUSD || 0), 0);
         const totalMineEGP = payments.reduce((s, p) => s + (p.mineEGP || 0), 0);
-        const totalMineUSD = payments.reduce((s, p) => s + (p.mineUSD || 0), 0);
         const totalGodMoney = payments.reduce((s, p) => s + (p.godAmount || 0), 0);
         const totalGodDisbursed = godsMoney.reduce((s, g) => s + (g.priceEGP || 0), 0);
         const totalSalariesPaid = salaries.reduce((s, sal) => s + (sal.amount || 0), 0);
 
         return {
           totalReceivedEGP,
-          totalReceivedUSD,
           totalMineEGP,
-          totalMineUSD,
           totalGodMoney,
           totalGodDisbursed,
           godMoneyBalance: totalGodMoney - totalGodDisbursed,

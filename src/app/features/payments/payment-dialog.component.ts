@@ -54,18 +54,8 @@ import { AttachmentManagerComponent } from '../../shared/components/attachment-m
             </mat-form-field>
 
             <mat-form-field appearance="outline">
-              <mat-label>Received (USD)</mat-label>
-              <input matInput type="number" formControlName="receivedUSD" />
-            </mat-form-field>
-
-            <mat-form-field appearance="outline">
               <mat-label>Mine (EGP)</mat-label>
               <input matInput type="number" formControlName="mineEGP" />
-            </mat-form-field>
-
-            <mat-form-field appearance="outline">
-              <mat-label>Mine (USD)</mat-label>
-              <input matInput type="number" formControlName="mineUSD" />
             </mat-form-field>
 
             <mat-form-field appearance="outline">
@@ -91,13 +81,6 @@ import { AttachmentManagerComponent } from '../../shared/components/attachment-m
                 <mat-form-field appearance="outline">
                   <mat-label>Amount</mat-label>
                   <input matInput type="number" formControlName="amount" />
-                </mat-form-field>
-                <mat-form-field appearance="outline" class="currency-field">
-                  <mat-label>Currency</mat-label>
-                  <mat-select formControlName="currency">
-                    <mat-option value="EGP">EGP</mat-option>
-                    <mat-option value="USD">USD</mat-option>
-                  </mat-select>
                 </mat-form-field>
                 <button mat-icon-button color="warn" (click)="removeSplit(i)">
                   <mat-icon>remove_circle</mat-icon>
@@ -136,7 +119,6 @@ import { AttachmentManagerComponent } from '../../shared/components/attachment-m
     .full-width { grid-column: span 2; }
     .split-row { display: flex; gap: 8px; align-items: center; margin-top: 8px; }
     .split-row mat-form-field { flex: 1; }
-    .currency-field { max-width: 100px; }
     .splits-section, .attachment-tab { padding: 16px 0; }
     @media (max-width: 599px) {
       .form-grid { grid-template-columns: 1fr; }
@@ -156,9 +138,7 @@ export class PaymentDialogComponent {
     subScope: ['', Validators.required],
     date: [new Date(), Validators.required],
     receivedEGP: [0],
-    receivedUSD: [0],
     mineEGP: [0],
-    mineUSD: [0],
     godAmount: [0],
     notes: [''],
     others: this.fb.array([]),
@@ -175,9 +155,7 @@ export class PaymentDialogComponent {
         subScope: data.payment.subScope,
         date: data.payment.date ? new Date(data.payment.date) : new Date(),
         receivedEGP: data.payment.receivedEGP,
-        receivedUSD: data.payment.receivedUSD,
         mineEGP: data.payment.mineEGP,
-        mineUSD: data.payment.mineUSD,
         godAmount: data.payment.godAmount,
         notes: data.payment.notes,
       });
@@ -188,7 +166,6 @@ export class PaymentDialogComponent {
             this.fb.group({
               personName: [split.personName],
               amount: [split.amount],
-              currency: [split.currency || 'EGP'],
             })
           );
         }
@@ -198,7 +175,7 @@ export class PaymentDialogComponent {
 
   addSplit() {
     this.othersArray.push(
-      this.fb.group({ personName: [''], amount: [0], currency: ['EGP'] })
+      this.fb.group({ personName: [''], amount: [0] })
     );
   }
 
@@ -219,9 +196,7 @@ export class PaymentDialogComponent {
       subScope: val.subScope,
       date: val.date,
       receivedEGP: val.receivedEGP || 0,
-      receivedUSD: val.receivedUSD || 0,
       mineEGP: val.mineEGP || 0,
-      mineUSD: val.mineUSD || 0,
       godAmount,
       godPercentage,
       others: val.others || [],
