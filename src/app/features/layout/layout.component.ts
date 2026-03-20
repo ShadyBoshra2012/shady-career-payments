@@ -151,8 +151,14 @@ import { AmountVisibilityService } from '../../core/services/amount-visibility.s
       color: rgba(255,255,255,0.75) !important;
       transition: all 0.2s ease !important;
     }
+    ::ng-deep .nav-item .mdc-list-item__primary-text {
+      color: rgba(255,255,255,0.75) !important;
+    }
     .nav-item:hover {
       background: rgba(255,255,255,0.08) !important;
+      color: #fff !important;
+    }
+    ::ng-deep .nav-item:hover .mdc-list-item__primary-text {
       color: #fff !important;
     }
     .nav-item:hover mat-icon {
@@ -163,6 +169,9 @@ import { AmountVisibilityService } from '../../core/services/amount-visibility.s
     }
     .active-link {
       background: rgba(67, 97, 238, 0.2) !important;
+      color: #a4b4ff !important;
+    }
+    ::ng-deep .active-link .mdc-list-item__primary-text {
       color: #a4b4ff !important;
     }
     .active-link mat-icon {
