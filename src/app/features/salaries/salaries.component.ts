@@ -1,0 +1,193 @@
+import { Component, inject, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { MatTableModule } from '@angular/material/table';
+import { MatSortModule, Sort } from '@angular/material/sort';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatCardModule } from '@angular/material/card';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSelectModule } from '@angular/material/select';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { DataService } from '../../core/services';
+import { Employee, SalaryPayment } from '../../core/models';
+import { SalaryDialogComponent } from './salary-dialog.component';
+
+@Component({
+  selector: 'app-salaries',
+  standalone: true,
+  imports: [
+    CommonModule, MatTableModule, MatSortModule, MatPaginatorModule,
+    MatButtonModule, MatIconModule, MatCardModule, MatFormFieldModule,
+    MatSelectModule, MatDialogModule, MatSnackBarModule,
+  ],
+  template: `
+    <div class="page-header">
+      <h1>Salary Payments</h1>
+      <button mat-fab color="primary" (click)="openDialog()">
+        <mat-icon>add</mat-icon>
+      </button>
+    </div>
+
+    <div class="stats-row">
+      <mat-card>
+        <mat-card-content>
+          <div class="stat-label">Total Payments</div>
+          <div class="stat-value">{{ filteredItems.length }}</div>
+        </mat-card-content>
+      </mat-card>
+      <mat-card>
+        <mat-card-content>
+          <div class="stat-label">Total Amount</div>
+          <div class="stat-value">{{ totalAmount | number:'1.0-0' }} EGP</div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <mat-card class="filter-card">
+      <mat-form-field appearance="outline">
+        <mat-label>Filter by Employee</mat-label>
+        <mat-select (selectionChange)="filterByEmployee($event.value)" [value]="''">
+          <mat-option value="">All Employees</mat-option>
+          @for (emp of employees; track emp.id) {
+            <mat-option [value]="emp.id">{{ emp.name }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </mat-card>
+
+    <mat-card>
+      <table mat-table [dataSource]="paginatedItems" matSort (matSortChange)="sortData($event)">
+        <ng-container matColumnDef="employeeName">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Employee</th>
+          <td mat-cell *matCellDef="let row">{{ row.employeeName }}</td>
+        </ng-container>
+        <ng-container matColumnDef="date">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Date</th>
+          <td mat-cell *matCellDef="let row">{{ row.date | date:'MMM yyyy' }}</td>
+        </ng-container>
+        <ng-container matColumnDef="amount">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Amount (EGP)</th>
+          <td mat-cell *matCellDef="let row">{{ row.amount | number:'1.0-0' }}</td>
+        </ng-container>
+        <ng-container matColumnDef="comments">
+          <th mat-header-cell *matHeaderCellDef>Comments</th>
+          <td mat-cell *matCellDef="let row">{{ row.comments }}</td>
+        </ng-container>
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef>Actions</th>
+          <td mat-cell *matCellDef="let row">
+            <button mat-icon-button (click)="openDialog(row)"><mat-icon>edit</mat-icon></button>
+            <button mat-icon-button color="warn" (click)="delete(row)"><mat-icon>delete</mat-icon></button>
+          </td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+      <mat-paginator [length]="filteredItems.length" [pageSize]="10" [pageSizeOptions]="[5, 10, 25, 50]"
+        (page)="onPage($event)"></mat-paginator>
+    </mat-card>
+  `,
+  styles: [`
+    .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+    .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 16px; }
+    .stat-label { font-size: 12px; color: #666; }
+    .stat-value { font-size: 24px; font-weight: 600; }
+    .filter-card { margin-bottom: 16px; padding-top: 16px; }
+    .filter-card mat-form-field { width: 100%; }
+    table { width: 100%; }
+  `],
+})
+export class SalariesComponent implements OnInit {
+  private dataService = inject(DataService);
+  private dialog = inject(MatDialog);
+  private snackBar = inject(MatSnackBar);
+
+  items: SalaryPayment[] = [];
+  filteredItems: SalaryPayment[] = [];
+  paginatedItems: SalaryPayment[] = [];
+  employees: Employee[] = [];
+  displayedColumns = ['employeeName', 'date', 'amount', 'comments', 'actions'];
+  totalAmount = 0;
+  selectedEmployeeId = '';
+  pageSize = 10;
+  pageIndex = 0;
+
+  ngOnInit() {
+    this.dataService.getEmployees().subscribe((emps) => {
+      this.employees = emps;
+      this.load();
+    });
+  }
+
+  load() {
+    this.dataService.getSalaryPayments().subscribe((items) => {
+      this.items = items.map((item) => ({
+        ...item,
+        employeeName: this.employees.find((e) => e.id === item.employeeId)?.name || item.employeeName || 'Unknown',
+      }));
+      this.applyFilter();
+    });
+  }
+
+  filterByEmployee(employeeId: string) {
+    this.selectedEmployeeId = employeeId;
+    this.pageIndex = 0;
+    this.applyFilter();
+  }
+
+  applyFilter() {
+    this.filteredItems = this.selectedEmployeeId
+      ? this.items.filter((i) => i.employeeId === this.selectedEmployeeId)
+      : [...this.items];
+    this.totalAmount = this.filteredItems.reduce((s, i) => s + (i.amount || 0), 0);
+    this.paginate();
+  }
+
+  sortData(sort: Sort) {
+    if (!sort.active || sort.direction === '') {
+      this.applyFilter();
+      return;
+    }
+    this.filteredItems.sort((a, b) => {
+      const aVal = (a as any)[sort.active];
+      const bVal = (b as any)[sort.active];
+      const cmp = aVal < bVal ? -1 : aVal > bVal ? 1 : 0;
+      return sort.direction === 'asc' ? cmp : -cmp;
+    });
+    this.paginate();
+  }
+
+  onPage(event: PageEvent) {
+    this.pageSize = event.pageSize;
+    this.pageIndex = event.pageIndex;
+    this.paginate();
+  }
+
+  paginate() {
+    const start = this.pageIndex * this.pageSize;
+    this.paginatedItems = this.filteredItems.slice(start, start + this.pageSize);
+  }
+
+  openDialog(item?: SalaryPayment) {
+    this.dialog.open(SalaryDialogComponent, { width: '500px', data: { item, employees: this.employees } })
+      .afterClosed().subscribe((result) => {
+        if (!result) return;
+        const emp = this.employees.find((e) => e.id === result.employeeId);
+        result.employeeName = emp?.name || '';
+        const op = item
+          ? this.dataService.updateSalaryPayment(item.id!, result)
+          : this.dataService.addSalaryPayment(result);
+        op.then(() => { this.snackBar.open('Saved!', 'OK', { duration: 2000 }); this.load(); });
+      });
+  }
+
+  delete(item: SalaryPayment) {
+    if (!confirm('Delete this salary payment?')) return;
+    this.dataService.deleteSalaryPayment(item.id!).then(() => {
+      this.snackBar.open('Deleted', 'OK', { duration: 2000 });
+      this.load();
+    });
+  }
+}
