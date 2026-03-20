@@ -1,14 +1,12 @@
 import { Injectable, inject } from '@angular/core';
 import {
   Auth,
-  createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
   user,
-  updateProfile,
   User,
 } from '@angular/fire/auth';
-import { Firestore, doc, setDoc, getDoc } from '@angular/fire/firestore';
+import { Firestore, doc, getDoc } from '@angular/fire/firestore';
 import { Observable, from, map, switchMap, of } from 'rxjs';
 import { UserProfile } from '../models';
 
@@ -27,19 +25,6 @@ export class AuthService {
       );
     })
   );
-
-  async register(email: string, password: string, displayName: string): Promise<void> {
-    const cred = await createUserWithEmailAndPassword(this.auth, email, password);
-    await updateProfile(cred.user, { displayName });
-    const profile: UserProfile = {
-      uid: cred.user.uid,
-      email,
-      displayName,
-      role: 'admin',
-      createdAt: new Date(),
-    };
-    await setDoc(doc(this.firestore, `users/${cred.user.uid}`), profile);
-  }
 
   async login(email: string, password: string): Promise<void> {
     await signInWithEmailAndPassword(this.auth, email, password);

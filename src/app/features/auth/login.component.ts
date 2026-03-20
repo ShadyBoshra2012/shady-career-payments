@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -16,7 +16,6 @@ import { AuthService } from '../../core/services/auth.service';
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    RouterLink,
     MatCardModule,
     MatFormFieldModule,
     MatInputModule,
@@ -60,9 +59,7 @@ import { AuthService } from '../../core/services/auth.service';
             </button>
           </form>
         </mat-card-content>
-        <mat-card-actions align="end">
-          <a mat-button routerLink="/register">Don't have an account? Register</a>
-        </mat-card-actions>
+
       </mat-card>
     </div>
   `,
