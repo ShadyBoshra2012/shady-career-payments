@@ -136,22 +136,25 @@ import { AuthService } from '../../core/services/auth.service';
     .nav-item {
       border-radius: 10px !important;
       margin-bottom: 2px !important;
-      color: rgba(255,255,255,0.6) !important;
+      color: rgba(255,255,255,0.75) !important;
       transition: all 0.2s ease !important;
     }
     .nav-item:hover {
-      background: rgba(255,255,255,0.06) !important;
-      color: rgba(255,255,255,0.9) !important;
+      background: rgba(255,255,255,0.08) !important;
+      color: #fff !important;
+    }
+    .nav-item:hover mat-icon {
+      color: rgba(255,255,255,0.95) !important;
     }
     .nav-item mat-icon {
-      color: rgba(255,255,255,0.5) !important;
+      color: rgba(255,255,255,0.6) !important;
     }
     .active-link {
-      background: rgba(67, 97, 238, 0.15) !important;
-      color: #8ca0ff !important;
+      background: rgba(67, 97, 238, 0.2) !important;
+      color: #a4b4ff !important;
     }
     .active-link mat-icon {
-      color: #8ca0ff !important;
+      color: #a4b4ff !important;
     }
 
     .sidenav-footer {
