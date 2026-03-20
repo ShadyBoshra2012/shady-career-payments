@@ -65,7 +65,7 @@ interface ProjectRow extends MainScope {
             <mat-icon>account_balance_wallet</mat-icon>
           </div>
           <div class="stat-body">
-            <span class="stat-value">{{ (amountVis.hidden$ | async) ? '•••' : (totalRevenue | number:'1.0-0') }}</span>
+            <span class="stat-value" [class.blurred]="amountVis.hidden$ | async">{{ totalRevenue | number:'1.0-0' }}</span>
             <span class="stat-label">Total Revenue (EGP)</span>
           </div>
         </div>
@@ -93,7 +93,7 @@ interface ProjectRow extends MainScope {
           </ng-container>
           <ng-container matColumnDef="totalReceived">
             <th mat-header-cell *matHeaderCellDef>Total Received</th>
-            <td mat-cell *matCellDef="let p" class="num-cell">{{ (amountVis.hidden$ | async) ? '•••' : ((p.totalReceived | number:'1.0-0') + ' EGP') }}</td>
+            <td mat-cell *matCellDef="let p" class="num-cell" [class.blurred]="amountVis.hidden$ | async">{{ p.totalReceived | number:'1.0-0' }} EGP</td>
           </ng-container>
           <ng-container matColumnDef="notes">
             <th mat-header-cell *matHeaderCellDef>Notes</th>

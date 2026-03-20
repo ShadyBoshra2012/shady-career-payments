@@ -34,7 +34,7 @@ import { EmployeeDialogComponent } from './employee-dialog.component';
       <table mat-table [dataSource]="sortedItems" matSort (matSortChange)="sortData($event)">
         <ng-container matColumnDef="name">
           <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
-          <td mat-cell *matCellDef="let row" class="name-cell">{{ row.name }}</td>
+          <td mat-cell *matCellDef="let row" class="name-cell" [class.blurred]="amountVis.hidden$ | async">{{ row.name }}</td>
         </ng-container>
         <ng-container matColumnDef="position">
           <th mat-header-cell *matHeaderCellDef mat-sort-header>Position</th>
@@ -42,7 +42,7 @@ import { EmployeeDialogComponent } from './employee-dialog.component';
         </ng-container>
         <ng-container matColumnDef="baseSalary">
           <th mat-header-cell *matHeaderCellDef mat-sort-header>Base Salary</th>
-          <td mat-cell *matCellDef="let row" class="num-cell">{{ (amountVis.hidden$ | async) ? '•••' : ((row.baseSalary | number:'1.0-0') + ' EGP') }}</td>
+          <td mat-cell *matCellDef="let row" class="num-cell" [class.blurred]="amountVis.hidden$ | async">{{ row.baseSalary | number:'1.0-0' }} EGP</td>
         </ng-container>
         <ng-container matColumnDef="paymentMethod">
           <th mat-header-cell *matHeaderCellDef>Payment Method</th>

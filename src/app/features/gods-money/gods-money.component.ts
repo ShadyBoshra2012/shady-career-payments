@@ -37,7 +37,7 @@ import { GodsMoneyDialogComponent } from './gods-money-dialog.component';
           <mat-icon>savings</mat-icon>
         </div>
         <div class="stat-info">
-          <span class="stat-value">{{ (amountVis.hidden$ | async) ? '•••' : (totalAccumulated | number:'1.0-0') }}</span>
+          <span class="stat-value" [class.blurred]="amountVis.hidden$ | async">{{ totalAccumulated | number:'1.0-0' }}</span>
           <span class="stat-label">Total Accumulated (EGP)</span>
         </div>
       </div>
@@ -46,7 +46,7 @@ import { GodsMoneyDialogComponent } from './gods-money-dialog.component';
           <mat-icon>send</mat-icon>
         </div>
         <div class="stat-info">
-          <span class="stat-value">{{ (amountVis.hidden$ | async) ? '•••' : (totalDisbursed | number:'1.0-0') }}</span>
+          <span class="stat-value" [class.blurred]="amountVis.hidden$ | async">{{ totalDisbursed | number:'1.0-0' }}</span>
           <span class="stat-label">Total Disbursed (EGP)</span>
         </div>
       </div>
@@ -55,7 +55,7 @@ import { GodsMoneyDialogComponent } from './gods-money-dialog.component';
           <mat-icon>account_balance</mat-icon>
         </div>
         <div class="stat-info">
-          <span class="stat-value" [class.negative]="balance < 0">{{ (amountVis.hidden$ | async) ? '•••' : (balance | number:'1.0-0') }}</span>
+          <span class="stat-value" [class.negative]="balance < 0" [class.blurred]="amountVis.hidden$ | async">{{ balance | number:'1.0-0' }}</span>
           <span class="stat-label">Remaining Balance (EGP)</span>
         </div>
       </div>
@@ -65,15 +65,15 @@ import { GodsMoneyDialogComponent } from './gods-money-dialog.component';
       <table mat-table [dataSource]="paginatedItems" matSort (matSortChange)="sortData($event)">
         <ng-container matColumnDef="responsibleTo">
           <th mat-header-cell *matHeaderCellDef mat-sort-header>Responsible To</th>
-          <td mat-cell *matCellDef="let row">{{ row.responsibleTo }}</td>
+          <td mat-cell *matCellDef="let row" [class.blurred]="amountVis.hidden$ | async">{{ row.responsibleTo }}</td>
         </ng-container>
         <ng-container matColumnDef="title">
           <th mat-header-cell *matHeaderCellDef mat-sort-header>Title</th>
-          <td mat-cell *matCellDef="let row">{{ row.title }}</td>
+          <td mat-cell *matCellDef="let row" [class.blurred]="amountVis.hidden$ | async">{{ row.title }}</td>
         </ng-container>
         <ng-container matColumnDef="priceEGP">
           <th mat-header-cell *matHeaderCellDef mat-sort-header>Amount (EGP)</th>
-          <td mat-cell *matCellDef="let row" class="num-cell">{{ (amountVis.hidden$ | async) ? '•••' : (row.priceEGP | number:'1.0-0') }}</td>
+          <td mat-cell *matCellDef="let row" class="num-cell" [class.blurred]="amountVis.hidden$ | async">{{ row.priceEGP | number:'1.0-0' }}</td>
         </ng-container>
         <ng-container matColumnDef="sendingDate">
           <th mat-header-cell *matHeaderCellDef mat-sort-header>Sending Date</th>

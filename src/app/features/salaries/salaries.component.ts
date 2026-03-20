@@ -49,7 +49,7 @@ import { SalaryDialogComponent } from './salary-dialog.component';
           <mat-icon>paid</mat-icon>
         </div>
         <div class="stat-info">
-          <span class="stat-value">{{ (amountVis.hidden$ | async) ? '•••' : (totalAmount | number:'1.0-0') }}</span>
+          <span class="stat-value" [class.blurred]="amountVis.hidden$ | async">{{ totalAmount | number:'1.0-0' }}</span>
           <span class="stat-label">Total Amount (EGP)</span>
         </div>
       </div>
@@ -71,7 +71,7 @@ import { SalaryDialogComponent } from './salary-dialog.component';
       <table mat-table [dataSource]="paginatedItems" matSort (matSortChange)="sortData($event)">
         <ng-container matColumnDef="employeeName">
           <th mat-header-cell *matHeaderCellDef mat-sort-header>Employee</th>
-          <td mat-cell *matCellDef="let row" class="name-cell">{{ row.employeeName }}</td>
+          <td mat-cell *matCellDef="let row" class="name-cell" [class.blurred]="amountVis.hidden$ | async">{{ row.employeeName }}</td>
         </ng-container>
         <ng-container matColumnDef="date">
           <th mat-header-cell *matHeaderCellDef mat-sort-header>Date</th>
@@ -79,7 +79,7 @@ import { SalaryDialogComponent } from './salary-dialog.component';
         </ng-container>
         <ng-container matColumnDef="amount">
           <th mat-header-cell *matHeaderCellDef mat-sort-header>Amount (EGP)</th>
-          <td mat-cell *matCellDef="let row" class="num-cell">{{ (amountVis.hidden$ | async) ? '•••' : (row.amount | number:'1.0-0') }}</td>
+          <td mat-cell *matCellDef="let row" class="num-cell" [class.blurred]="amountVis.hidden$ | async">{{ row.amount | number:'1.0-0' }}</td>
         </ng-container>
         <ng-container matColumnDef="comments">
           <th mat-header-cell *matHeaderCellDef>Comments</th>

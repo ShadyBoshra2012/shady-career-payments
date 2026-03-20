@@ -71,7 +71,7 @@ interface ProjectGroup {
             <mat-icon>trending_up</mat-icon>
           </div>
           <div class="stat-body">
-            <span class="stat-value">{{ (amountVis.hidden$ | async) ? '•••' : (totalReceived | number:'1.0-0') }}</span>
+            <span class="stat-value" [class.blurred]="amountVis.hidden$ | async">{{ totalReceived | number:'1.0-0' }}</span>
             <span class="stat-label">Total Received (EGP)</span>
           </div>
         </div>
@@ -80,7 +80,7 @@ interface ProjectGroup {
             <mat-icon>account_balance_wallet</mat-icon>
           </div>
           <div class="stat-body">
-            <span class="stat-value">{{ (amountVis.hidden$ | async) ? '•••' : (totalMine | number:'1.0-0') }}</span>
+            <span class="stat-value" [class.blurred]="amountVis.hidden$ | async">{{ totalMine | number:'1.0-0' }}</span>
             <span class="stat-label">My Earnings (EGP)</span>
           </div>
         </div>
@@ -89,7 +89,7 @@ interface ProjectGroup {
             <mat-icon>volunteer_activism</mat-icon>
           </div>
           <div class="stat-body">
-            <span class="stat-value">{{ (amountVis.hidden$ | async) ? '•••' : (totalGod | number:'1.0-0') }}</span>
+            <span class="stat-value" [class.blurred]="amountVis.hidden$ | async">{{ totalGod | number:'1.0-0' }}</span>
             <span class="stat-label">God's Money (EGP)</span>
           </div>
         </div>
@@ -120,9 +120,9 @@ interface ProjectGroup {
               </mat-panel-title>
               <mat-panel-description>
                 <div class="panel-stats">
-                  <span class="chip received-chip">{{ (amountVis.hidden$ | async) ? '•••' : ((group.totalReceived | number:'1.0-0') + ' EGP') }}</span>
-                  <span class="chip mine-chip">{{ (amountVis.hidden$ | async) ? '•••' : ((group.totalMine | number:'1.0-0') + ' EGP') }}</span>
-                  <span class="chip god-chip">{{ (amountVis.hidden$ | async) ? '•••' : ((group.totalGod | number:'1.0-0') + ' EGP') }}</span>
+                  <span class="chip received-chip" [class.blurred]="amountVis.hidden$ | async">{{ group.totalReceived | number:'1.0-0' }} EGP</span>
+                  <span class="chip mine-chip" [class.blurred]="amountVis.hidden$ | async">{{ group.totalMine | number:'1.0-0' }} EGP</span>
+                  <span class="chip god-chip" [class.blurred]="amountVis.hidden$ | async">{{ group.totalGod | number:'1.0-0' }} EGP</span>
                 </div>
               </mat-panel-description>
             </mat-expansion-panel-header>
@@ -139,19 +139,19 @@ interface ProjectGroup {
                 </ng-container>
                 <ng-container matColumnDef="receivedEGP">
                   <th mat-header-cell *matHeaderCellDef>Received</th>
-                  <td mat-cell *matCellDef="let p" class="num-cell">{{ (amountVis.hidden$ | async) ? '•••' : (p.receivedEGP | number:'1.0-0') }}</td>
+                  <td mat-cell *matCellDef="let p" class="num-cell" [class.blurred]="amountVis.hidden$ | async">{{ p.receivedEGP | number:'1.0-0' }}</td>
                 </ng-container>
                 <ng-container matColumnDef="mineEGP">
                   <th mat-header-cell *matHeaderCellDef>Mine</th>
-                  <td mat-cell *matCellDef="let p" class="num-cell">{{ (amountVis.hidden$ | async) ? '•••' : (p.mineEGP | number:'1.0-0') }}</td>
+                  <td mat-cell *matCellDef="let p" class="num-cell" [class.blurred]="amountVis.hidden$ | async">{{ p.mineEGP | number:'1.0-0' }}</td>
                 </ng-container>
                 <ng-container matColumnDef="godAmount">
                   <th mat-header-cell *matHeaderCellDef>God</th>
-                  <td mat-cell *matCellDef="let p" class="num-cell">{{ (amountVis.hidden$ | async) ? '•••' : (p.godAmount | number:'1.0-0') }}</td>
+                  <td mat-cell *matCellDef="let p" class="num-cell" [class.blurred]="amountVis.hidden$ | async">{{ p.godAmount | number:'1.0-0' }}</td>
                 </ng-container>
                 <ng-container matColumnDef="godPercentage">
                   <th mat-header-cell *matHeaderCellDef>God %</th>
-                  <td mat-cell *matCellDef="let p" class="num-cell">{{ (amountVis.hidden$ | async) ? '•••' : ((p.godPercentage | number:'1.1-1') + '%') }}</td>
+                  <td mat-cell *matCellDef="let p" class="num-cell" [class.blurred]="amountVis.hidden$ | async">{{ p.godPercentage | number:'1.1-1' }}%</td>
                 </ng-container>
                 <ng-container matColumnDef="splits">
                   <th mat-header-cell *matHeaderCellDef>Splits</th>
@@ -186,7 +186,7 @@ interface ProjectGroup {
                         <div class="split-detail-header">
                           <mat-icon>call_split</mat-icon>
                           <span>Payment Splits</span>
-                          <span class="split-total">Total: {{ (amountVis.hidden$ | async) ? '•••' : ((getSplitTotal(p) | number:'1.0-0') + ' EGP') }}</span>
+                          <span class="split-total" [class.blurred]="amountVis.hidden$ | async">Total: {{ getSplitTotal(p) | number:'1.0-0' }} EGP</span>
                         </div>
                         <div class="split-items">
                           @for (split of p.others; track $index) {
@@ -195,7 +195,7 @@ interface ProjectGroup {
                                 <mat-icon class="split-person-icon">person</mat-icon>
                                 <span>{{ split.personName }}</span>
                               </div>
-                              <span class="split-amount">{{ (amountVis.hidden$ | async) ? '•••' : ((split.amount | number:'1.0-0') + ' EGP') }}</span>
+                              <span class="split-amount" [class.blurred]="amountVis.hidden$ | async">{{ split.amount | number:'1.0-0' }} EGP</span>
                             </div>
                           }
                         </div>
