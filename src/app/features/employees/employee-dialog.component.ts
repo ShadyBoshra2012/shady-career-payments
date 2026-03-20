@@ -17,7 +17,9 @@ import { Employee } from '../../core/models';
     MatSelectModule, MatSlideToggleModule, MatButtonModule,
   ],
   template: `
-    <h2 mat-dialog-title>{{ data.item ? 'Edit' : 'Add' }} Employee</h2>
+    <div class="dialog-header">
+      <h2 mat-dialog-title>{{ data.item ? 'Edit' : 'Add' }} Employee</h2>
+    </div>
     <mat-dialog-content>
       <form [formGroup]="form" class="form-col">
         <mat-form-field appearance="outline">
@@ -53,12 +55,15 @@ import { Employee } from '../../core/models';
       </form>
     </mat-dialog-content>
     <mat-dialog-actions align="end">
-      <button mat-button mat-dialog-close>Cancel</button>
-      <button mat-raised-button color="primary" (click)="save()" [disabled]="form.invalid">Save</button>
+      <button mat-button mat-dialog-close class="cancel-btn">Cancel</button>
+      <button mat-raised-button color="primary" (click)="save()" [disabled]="form.invalid" class="save-btn">Save</button>
     </mat-dialog-actions>
   `,
   styles: [`
+    .dialog-header h2 { font-size: 20px; font-weight: 700; letter-spacing: -0.3px; color: var(--text-primary); }
     .form-col { display: flex; flex-direction: column; gap: 4px; padding: 16px 0; }
+    .save-btn { border-radius: 10px !important; font-weight: 600 !important; padding: 0 24px !important; }
+    .cancel-btn { border-radius: 10px !important; }
   `],
 })
 export class EmployeeDialogComponent {

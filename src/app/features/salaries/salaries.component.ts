@@ -23,26 +23,35 @@ import { SalaryDialogComponent } from './salary-dialog.component';
     MatSelectModule, MatDialogModule, MatSnackBarModule,
   ],
   template: `
-    <div class="page-header">
-      <h1>Salary Payments</h1>
-      <button mat-fab color="primary" (click)="openDialog()">
-        <mat-icon>add</mat-icon>
+    <div class="page-intro">
+      <div class="intro-text">
+        <h1>Salary Payments</h1>
+        <p>Track employee compensation</p>
+      </div>
+      <button mat-fab extended color="primary" (click)="openDialog()" class="add-btn">
+        <mat-icon>add</mat-icon> Add Payment
       </button>
     </div>
 
-    <div class="stats-row">
-      <mat-card>
-        <mat-card-content>
-          <div class="stat-label">Total Payments</div>
-          <div class="stat-value">{{ filteredItems.length }}</div>
-        </mat-card-content>
-      </mat-card>
-      <mat-card>
-        <mat-card-content>
-          <div class="stat-label">Total Amount</div>
-          <div class="stat-value">{{ totalAmount | number:'1.0-0' }} EGP</div>
-        </mat-card-content>
-      </mat-card>
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon-wrap purple">
+          <mat-icon>receipt_long</mat-icon>
+        </div>
+        <div class="stat-info">
+          <span class="stat-value">{{ filteredItems.length }}</span>
+          <span class="stat-label">Total Payments</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon-wrap red">
+          <mat-icon>paid</mat-icon>
+        </div>
+        <div class="stat-info">
+          <span class="stat-value">{{ totalAmount | number:'1.0-0' }}</span>
+          <span class="stat-label">Total Amount (EGP)</span>
+        </div>
+      </div>
     </div>
 
     <mat-card class="filter-card">
@@ -57,11 +66,11 @@ import { SalaryDialogComponent } from './salary-dialog.component';
       </mat-form-field>
     </mat-card>
 
-    <mat-card>
+    <mat-card class="table-card">
       <table mat-table [dataSource]="paginatedItems" matSort (matSortChange)="sortData($event)">
         <ng-container matColumnDef="employeeName">
           <th mat-header-cell *matHeaderCellDef mat-sort-header>Employee</th>
-          <td mat-cell *matCellDef="let row">{{ row.employeeName }}</td>
+          <td mat-cell *matCellDef="let row" class="name-cell">{{ row.employeeName }}</td>
         </ng-container>
         <ng-container matColumnDef="date">
           <th mat-header-cell *matHeaderCellDef mat-sort-header>Date</th>
@@ -69,14 +78,14 @@ import { SalaryDialogComponent } from './salary-dialog.component';
         </ng-container>
         <ng-container matColumnDef="amount">
           <th mat-header-cell *matHeaderCellDef mat-sort-header>Amount (EGP)</th>
-          <td mat-cell *matCellDef="let row">{{ row.amount | number:'1.0-0' }}</td>
+          <td mat-cell *matCellDef="let row" class="num-cell">{{ row.amount | number:'1.0-0' }}</td>
         </ng-container>
         <ng-container matColumnDef="comments">
           <th mat-header-cell *matHeaderCellDef>Comments</th>
-          <td mat-cell *matCellDef="let row">{{ row.comments }}</td>
+          <td mat-cell *matCellDef="let row" class="comment-cell">{{ row.comments }}</td>
         </ng-container>
         <ng-container matColumnDef="actions">
-          <th mat-header-cell *matHeaderCellDef>Actions</th>
+          <th mat-header-cell *matHeaderCellDef></th>
           <td mat-cell *matCellDef="let row">
             <button mat-icon-button (click)="openDialog(row)"><mat-icon>edit</mat-icon></button>
             <button mat-icon-button color="warn" (click)="delete(row)"><mat-icon>delete</mat-icon></button>
@@ -90,13 +99,54 @@ import { SalaryDialogComponent } from './salary-dialog.component';
     </mat-card>
   `,
   styles: [`
-    .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-    .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 16px; }
-    .stat-label { font-size: 12px; color: #666; }
-    .stat-value { font-size: 24px; font-weight: 600; }
-    .filter-card { margin-bottom: 16px; padding-top: 16px; }
+    .page-intro {
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 16px; margin-bottom: 20px;
+    }
+    .intro-text h1 {
+      font-size: 26px; font-weight: 700; margin: 0 0 2px;
+      color: var(--text-primary); letter-spacing: -0.3px;
+    }
+    .intro-text p { font-size: 14px; color: var(--text-muted); margin: 0; }
+    .add-btn { border-radius: 12px !important; font-weight: 600 !important; }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px; margin-bottom: 20px;
+    }
+    .stat-card {
+      display: flex; align-items: center; gap: 16px;
+      padding: 20px; background: var(--surface-card);
+      border-radius: var(--radius-lg); border: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+    }
+    .stat-icon-wrap {
+      width: 48px; height: 48px; border-radius: 14px;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .stat-icon-wrap mat-icon { font-size: 24px; width: 24px; height: 24px; color: #fff; }
+    .stat-icon-wrap.purple { background: linear-gradient(135deg, #7c3aed, #6d28d9); }
+    .stat-icon-wrap.red { background: linear-gradient(135deg, #ef4444, #dc2626); }
+    .stat-info { display: flex; flex-direction: column; }
+    .stat-value { font-size: 22px; font-weight: 700; color: var(--text-primary); letter-spacing: -0.5px; }
+    .stat-label { font-size: 12px; color: var(--text-muted); font-weight: 500; margin-top: 2px; }
+
+    .filter-card {
+      margin-bottom: 16px; padding: 16px 20px 0 !important;
+    }
     .filter-card mat-form-field { width: 100%; }
+
+    .table-card { padding: 0 !important; overflow: hidden; }
     table { width: 100%; }
+    .name-cell { font-weight: 600; color: var(--text-primary); }
+    .num-cell { font-variant-numeric: tabular-nums; font-weight: 500; }
+    .comment-cell { color: var(--text-secondary); font-size: 13px; }
+
+    @media (max-width: 599px) {
+      .page-intro { flex-direction: column; align-items: flex-start; }
+      .stats-grid { grid-template-columns: 1fr; }
+    }
   `],
 })
 export class SalariesComponent implements OnInit {

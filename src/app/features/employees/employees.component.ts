@@ -5,7 +5,6 @@ import { MatSortModule, Sort } from '@angular/material/sort';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
-import { MatChipsModule } from '@angular/material/chips';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { DataService } from '../../core/services';
@@ -17,21 +16,24 @@ import { EmployeeDialogComponent } from './employee-dialog.component';
   standalone: true,
   imports: [
     CommonModule, MatTableModule, MatSortModule, MatButtonModule, MatIconModule,
-    MatCardModule, MatChipsModule, MatDialogModule, MatSnackBarModule,
+    MatCardModule, MatDialogModule, MatSnackBarModule,
   ],
   template: `
-    <div class="page-header">
-      <h1>Employees</h1>
-      <button mat-fab color="primary" (click)="openDialog()">
-        <mat-icon>add</mat-icon>
+    <div class="page-intro">
+      <div class="intro-text">
+        <h1>Employees</h1>
+        <p>Manage your team members</p>
+      </div>
+      <button mat-fab extended color="primary" (click)="openDialog()" class="add-btn">
+        <mat-icon>add</mat-icon> Add Employee
       </button>
     </div>
 
-    <mat-card>
+    <mat-card class="table-card">
       <table mat-table [dataSource]="sortedItems" matSort (matSortChange)="sortData($event)">
         <ng-container matColumnDef="name">
           <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
-          <td mat-cell *matCellDef="let row">{{ row.name }}</td>
+          <td mat-cell *matCellDef="let row" class="name-cell">{{ row.name }}</td>
         </ng-container>
         <ng-container matColumnDef="position">
           <th mat-header-cell *matHeaderCellDef mat-sort-header>Position</th>
@@ -39,22 +41,24 @@ import { EmployeeDialogComponent } from './employee-dialog.component';
         </ng-container>
         <ng-container matColumnDef="baseSalary">
           <th mat-header-cell *matHeaderCellDef mat-sort-header>Base Salary</th>
-          <td mat-cell *matCellDef="let row">{{ row.baseSalary | number:'1.0-0' }} EGP</td>
+          <td mat-cell *matCellDef="let row" class="num-cell">{{ row.baseSalary | number:'1.0-0' }} EGP</td>
         </ng-container>
         <ng-container matColumnDef="paymentMethod">
           <th mat-header-cell *matHeaderCellDef>Payment Method</th>
-          <td mat-cell *matCellDef="let row">{{ row.paymentMethod }}</td>
+          <td mat-cell *matCellDef="let row">
+            <span class="method-chip">{{ row.paymentMethod }}</span>
+          </td>
         </ng-container>
         <ng-container matColumnDef="isActive">
           <th mat-header-cell *matHeaderCellDef>Status</th>
           <td mat-cell *matCellDef="let row">
-            <mat-chip [highlighted]="row.isActive" [color]="row.isActive ? 'primary' : 'warn'">
+            <span class="status-badge" [class.active]="row.isActive" [class.inactive]="!row.isActive">
               {{ row.isActive ? 'Active' : 'Inactive' }}
-            </mat-chip>
+            </span>
           </td>
         </ng-container>
         <ng-container matColumnDef="actions">
-          <th mat-header-cell *matHeaderCellDef>Actions</th>
+          <th mat-header-cell *matHeaderCellDef></th>
           <td mat-cell *matCellDef="let row">
             <button mat-icon-button (click)="openDialog(row)"><mat-icon>edit</mat-icon></button>
             <button mat-icon-button color="warn" (click)="delete(row)"><mat-icon>delete</mat-icon></button>
@@ -66,8 +70,41 @@ import { EmployeeDialogComponent } from './employee-dialog.component';
     </mat-card>
   `,
   styles: [`
-    .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+    .page-intro {
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 16px; margin-bottom: 20px;
+    }
+    .intro-text h1 {
+      font-size: 26px; font-weight: 700; margin: 0 0 2px;
+      color: var(--text-primary); letter-spacing: -0.3px;
+    }
+    .intro-text p { font-size: 14px; color: var(--text-muted); margin: 0; }
+    .add-btn { border-radius: 12px !important; font-weight: 600 !important; }
+
+    .table-card { padding: 0 !important; overflow: hidden; }
     table { width: 100%; }
+    .name-cell { font-weight: 600; color: var(--text-primary); }
+    .num-cell { font-variant-numeric: tabular-nums; font-weight: 500; }
+
+    .method-chip {
+      display: inline-block; padding: 4px 12px;
+      background: var(--accent-blue-soft); color: var(--accent-blue);
+      border-radius: 8px; font-size: 12px; font-weight: 600;
+    }
+    .status-badge {
+      display: inline-block; padding: 4px 12px;
+      border-radius: 8px; font-size: 12px; font-weight: 600;
+    }
+    .status-badge.active {
+      background: rgba(14,173,105,0.1); color: #059652;
+    }
+    .status-badge.inactive {
+      background: rgba(239,68,68,0.1); color: #dc2626;
+    }
+
+    @media (max-width: 599px) {
+      .page-intro { flex-direction: column; align-items: flex-start; }
+    }
   `],
 })
 export class EmployeesComponent implements OnInit {

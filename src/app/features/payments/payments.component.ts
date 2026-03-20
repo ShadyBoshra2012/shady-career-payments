@@ -46,52 +46,67 @@ interface ProjectGroup {
     @if (loading) {
       <div class="loading"><mat-spinner></mat-spinner></div>
     } @else {
-      <div class="header-row">
+      <div class="page-intro">
+        <div class="intro-text">
+          <h1>Payments</h1>
+          <p>Track all project income and splits</p>
+        </div>
+        <button mat-fab extended color="primary" (click)="openDialog()" class="add-btn">
+          <mat-icon>add</mat-icon> New Payment
+        </button>
+      </div>
+
+      <div class="search-row">
         <mat-form-field appearance="outline" class="filter-field">
           <mat-label>Search payments...</mat-label>
           <input matInput (input)="applyFilter($event)" />
           <mat-icon matSuffix>search</mat-icon>
         </mat-form-field>
-        <button mat-fab extended color="primary" (click)="openDialog()">
-          <mat-icon>add</mat-icon> New Payment
-        </button>
       </div>
 
       <div class="stats-grid">
         <div class="stat-card received">
-          <mat-icon>trending_up</mat-icon>
+          <div class="stat-icon-wrap">
+            <mat-icon>trending_up</mat-icon>
+          </div>
           <div class="stat-body">
             <span class="stat-value">{{ totalReceived | number:'1.0-0' }}</span>
-            <span class="stat-unit">EGP</span>
+            <span class="stat-label">Total Received (EGP)</span>
           </div>
-          <span class="stat-label">Total Received</span>
         </div>
         <div class="stat-card mine">
-          <mat-icon>account_balance_wallet</mat-icon>
+          <div class="stat-icon-wrap">
+            <mat-icon>account_balance_wallet</mat-icon>
+          </div>
           <div class="stat-body">
             <span class="stat-value">{{ totalMine | number:'1.0-0' }}</span>
-            <span class="stat-unit">EGP</span>
+            <span class="stat-label">My Earnings (EGP)</span>
           </div>
-          <span class="stat-label">My Earnings</span>
         </div>
         <div class="stat-card god">
-          <mat-icon>volunteer_activism</mat-icon>
+          <div class="stat-icon-wrap">
+            <mat-icon>volunteer_activism</mat-icon>
+          </div>
           <div class="stat-body">
             <span class="stat-value">{{ totalGod | number:'1.0-0' }}</span>
-            <span class="stat-unit">EGP</span>
+            <span class="stat-label">God's Money (EGP)</span>
           </div>
-          <span class="stat-label">God's Money</span>
         </div>
         <div class="stat-card count">
-          <mat-icon>receipt_long</mat-icon>
+          <div class="stat-icon-wrap">
+            <mat-icon>receipt_long</mat-icon>
+          </div>
           <div class="stat-body">
             <span class="stat-value">{{ totalCount }}</span>
+            <span class="stat-label">Records</span>
           </div>
-          <span class="stat-label">Records</span>
         </div>
       </div>
 
-      <h3 class="section-title">Projects ({{ projectGroups.length }})</h3>
+      <div class="section-header">
+        <h3>Projects</h3>
+        <span class="section-count">{{ projectGroups.length }}</span>
+      </div>
 
       <mat-accordion multi>
         @for (group of projectGroups; track group.scopeId; let i = $index) {
@@ -161,78 +176,100 @@ interface ProjectGroup {
   styles: [`
     .loading { display: flex; justify-content: center; padding: 48px; }
 
-    .header-row {
-      display: flex; flex-wrap: wrap; gap: 16px;
-      align-items: center; margin-bottom: 20px;
+    .page-intro {
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 16px; margin-bottom: 20px;
     }
-    .filter-field { flex: 1; min-width: 200px; }
+    .intro-text h1 {
+      font-size: 26px; font-weight: 700; margin: 0 0 2px;
+      color: var(--text-primary); letter-spacing: -0.3px;
+    }
+    .intro-text p {
+      font-size: 14px; color: var(--text-muted); margin: 0;
+    }
+    .add-btn {
+      border-radius: 12px !important;
+      font-weight: 600 !important;
+    }
+
+    .search-row { margin-bottom: 16px; }
+    .filter-field { width: 100%; }
 
     /* ---- Summary stat cards ---- */
     .stats-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 16px; margin-bottom: 28px;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 14px; margin-bottom: 28px;
     }
     .stat-card {
-      border-radius: 16px; padding: 20px;
-      display: flex; flex-direction: column; gap: 4px;
+      border-radius: var(--radius-lg); padding: 20px;
+      display: flex; align-items: center; gap: 14px;
       color: #fff; position: relative; overflow: hidden;
     }
-    .stat-card mat-icon {
-      font-size: 32px; width: 32px; height: 32px; opacity: .85;
+    .stat-icon-wrap {
+      width: 44px; height: 44px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(255,255,255,0.2); flex-shrink: 0;
     }
-    .stat-body { display: flex; align-items: baseline; gap: 4px; }
-    .stat-value { font-size: 26px; font-weight: 700; letter-spacing: -0.5px; }
-    .stat-unit { font-size: 14px; font-weight: 500; opacity: .8; }
-    .stat-label { font-size: 13px; opacity: .8; font-weight: 500; }
-    .stat-card.received { background: linear-gradient(135deg, #1e88e5, #1565c0); }
-    .stat-card.mine { background: linear-gradient(135deg, #43a047, #2e7d32); }
-    .stat-card.god { background: linear-gradient(135deg, #fb8c00, #ef6c00); }
-    .stat-card.count { background: linear-gradient(135deg, #7e57c2, #5e35b1); }
+    .stat-icon-wrap mat-icon {
+      font-size: 24px; width: 24px; height: 24px;
+    }
+    .stat-body { display: flex; flex-direction: column; }
+    .stat-value { font-size: 24px; font-weight: 700; letter-spacing: -0.5px; line-height: 1.2; }
+    .stat-label { font-size: 12px; opacity: .75; font-weight: 500; margin-top: 2px; }
+    .stat-card.received { background: linear-gradient(135deg, #4361ee, #3651d4); }
+    .stat-card.mine { background: linear-gradient(135deg, #0ead69, #059652); }
+    .stat-card.god { background: linear-gradient(135deg, #f59e0b, #d97706); }
+    .stat-card.count { background: linear-gradient(135deg, #7c3aed, #6d28d9); }
 
-    /* ---- Section title ---- */
-    .section-title {
-      font-size: 16px; font-weight: 600; color: #444;
-      margin: 0 0 12px 4px;
+    /* ---- Section header ---- */
+    .section-header {
+      display: flex; align-items: center; gap: 10px;
+      margin: 0 0 14px 2px;
+    }
+    .section-header h3 {
+      font-size: 16px; font-weight: 700; color: var(--text-primary); margin: 0;
+    }
+    .section-count {
+      display: inline-flex; align-items: center; justify-content: center;
+      background: var(--accent-blue-soft); color: var(--accent-blue);
+      font-size: 12px; font-weight: 700; border-radius: 8px;
+      padding: 2px 10px; height: 24px;
     }
 
     /* ---- Project panels ---- */
-    .project-panel { margin-bottom: 6px; border-radius: 12px !important; }
+    .project-panel { margin-bottom: 8px !important; }
     .project-rank {
       display: inline-flex; align-items: center; justify-content: center;
-      width: 26px; height: 26px; border-radius: 50%;
-      background: #e3f2fd; color: #1565c0;
-      font-size: 13px; font-weight: 700; margin-right: 10px; flex-shrink: 0;
+      width: 26px; height: 26px; border-radius: 8px;
+      background: var(--accent-blue-soft); color: var(--accent-blue);
+      font-size: 12px; font-weight: 700; margin-right: 10px; flex-shrink: 0;
     }
-    .project-name { font-weight: 600; font-size: 15px; }
+    .project-name { font-weight: 600; font-size: 14px; color: var(--text-primary); }
     .badge {
       display: inline-flex; align-items: center; justify-content: center;
-      background: #1565c0; color: #fff; border-radius: 12px;
+      background: var(--accent-blue); color: #fff; border-radius: 8px;
       font-size: 11px; min-width: 22px; height: 20px; padding: 0 7px; margin-left: 8px;
       font-weight: 600;
     }
     .panel-stats { display: flex; gap: 8px; flex-wrap: wrap; }
     .chip {
-      display: inline-block; padding: 3px 10px; border-radius: 20px;
+      display: inline-block; padding: 4px 12px; border-radius: 8px;
       font-size: 12px; font-weight: 600; white-space: nowrap;
     }
-    .received-chip { background: #e3f2fd; color: #1565c0; }
-    .mine-chip { background: #e8f5e9; color: #2e7d32; }
-    .god-chip { background: #fff3e0; color: #e65100; }
+    .received-chip { background: rgba(67,97,238,0.08); color: #4361ee; }
+    .mine-chip { background: rgba(14,173,105,0.08); color: #059652; }
+    .god-chip { background: rgba(245,158,11,0.08); color: #b45309; }
 
     /* ---- Table inside panels ---- */
     .table-container { overflow-x: auto; margin-top: 8px; }
     table { width: 100%; }
-    th { font-weight: 600 !important; font-size: 13px; color: #555; }
-    td { font-size: 14px; }
-    .num-cell { font-variant-numeric: tabular-nums; }
-    tr.mat-mdc-row:hover { background: #f5f5f5; }
+    .num-cell { font-variant-numeric: tabular-nums; font-weight: 500; }
 
     @media (max-width: 599px) {
-      .header-row { flex-direction: column; }
-      .filter-field { min-width: 100%; }
+      .page-intro { flex-direction: column; align-items: flex-start; }
       .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-      .stat-value { font-size: 20px; }
+      .stat-value { font-size: 18px; }
       .stat-card { padding: 14px; }
       .panel-stats { display: none; }
       .project-rank { width: 22px; height: 22px; font-size: 11px; }

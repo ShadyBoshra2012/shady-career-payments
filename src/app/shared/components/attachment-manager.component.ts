@@ -50,15 +50,18 @@ import { PaymentAttachment } from '../../core/models';
     </div>
   `,
   styles: [`
-    .upload-area { margin-bottom: 8px; }
-    .attachment-list { display: flex; flex-wrap: wrap; gap: 8px; }
+    .upload-area { margin-bottom: 12px; }
+    .upload-area button { border-radius: 10px !important; }
+    .attachment-list { display: flex; flex-wrap: wrap; gap: 10px; }
     .attachment-item {
-      display: flex; align-items: center; gap: 6px;
-      padding: 4px 8px; background: #f5f5f5; border-radius: 8px;
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px 12px; background: var(--surface); border-radius: 12px;
+      border: 1px solid var(--border); transition: box-shadow 0.2s;
     }
-    .thumb { width: 40px; height: 40px; object-fit: cover; border-radius: 4px; cursor: pointer; }
-    .file-icon { cursor: pointer; color: #666; }
-    .att-name { font-size: 12px; cursor: pointer; max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .attachment-item:hover { box-shadow: var(--shadow-sm); }
+    .thumb { width: 40px; height: 40px; object-fit: cover; border-radius: 6px; cursor: pointer; }
+    .file-icon { cursor: pointer; color: var(--text-muted); }
+    .att-name { font-size: 13px; cursor: pointer; max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text-primary); font-weight: 500; }
   `],
 })
 export class AttachmentManagerComponent {

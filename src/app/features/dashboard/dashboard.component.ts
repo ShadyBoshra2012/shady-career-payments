@@ -25,54 +25,73 @@ import { Payment, GodsMoney, SalaryPayment, DashboardStats } from '../../core/mo
     @if (loading) {
       <div class="loading"><mat-spinner></mat-spinner></div>
     } @else {
+      <div class="page-intro">
+        <h1>Dashboard</h1>
+        <p>Your financial overview at a glance</p>
+      </div>
+
       <div class="stats-grid">
-        <mat-card class="stat-card">
-          <mat-icon class="stat-icon income">trending_up</mat-icon>
-          <div class="stat-info">
-            <span class="stat-value">{{ stats.totalReceivedEGP | number:'1.0-0' }} EGP</span>
-            <span class="stat-label">Total Received</span>
+        <div class="stat-card">
+          <div class="stat-icon-wrap green">
+            <mat-icon>trending_up</mat-icon>
           </div>
-        </mat-card>
-        <mat-card class="stat-card">
-          <mat-icon class="stat-icon mine">account_balance</mat-icon>
           <div class="stat-info">
-            <span class="stat-value">{{ stats.totalMineEGP | number:'1.0-0' }} EGP</span>
-            <span class="stat-label">My Earnings</span>
+            <span class="stat-value">{{ stats.totalReceivedEGP | number:'1.0-0' }}</span>
+            <span class="stat-label">Total Received (EGP)</span>
           </div>
-        </mat-card>
-        <mat-card class="stat-card">
-          <mat-icon class="stat-icon god">volunteer_activism</mat-icon>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon-wrap blue">
+            <mat-icon>account_balance</mat-icon>
+          </div>
           <div class="stat-info">
-            <span class="stat-value">{{ stats.totalGodMoney | number:'1.0-0' }} EGP</span>
+            <span class="stat-value">{{ stats.totalMineEGP | number:'1.0-0' }}</span>
+            <span class="stat-label">My Earnings (EGP)</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon-wrap orange">
+            <mat-icon>volunteer_activism</mat-icon>
+          </div>
+          <div class="stat-info">
+            <span class="stat-value">{{ stats.totalGodMoney | number:'1.0-0' }}</span>
             <span class="stat-label">God's Money Accumulated</span>
           </div>
-        </mat-card>
-        <mat-card class="stat-card">
-          <mat-icon class="stat-icon salary">paid</mat-icon>
-          <div class="stat-info">
-            <span class="stat-value">{{ stats.totalSalariesPaid | number:'1.0-0' }} EGP</span>
-            <span class="stat-label">Salaries Paid</span>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon-wrap red">
+            <mat-icon>paid</mat-icon>
           </div>
-        </mat-card>
-        <mat-card class="stat-card">
-          <mat-icon class="stat-icon projects">folder</mat-icon>
+          <div class="stat-info">
+            <span class="stat-value">{{ stats.totalSalariesPaid | number:'1.0-0' }}</span>
+            <span class="stat-label">Salaries Paid (EGP)</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon-wrap purple">
+            <mat-icon>folder</mat-icon>
+          </div>
           <div class="stat-info">
             <span class="stat-value">{{ stats.projectCount }}</span>
             <span class="stat-label">Projects</span>
           </div>
-        </mat-card>
-        <mat-card class="stat-card">
-          <mat-icon class="stat-icon emp">people</mat-icon>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon-wrap teal">
+            <mat-icon>people</mat-icon>
+          </div>
           <div class="stat-info">
             <span class="stat-value">{{ stats.employeeCount }}</span>
             <span class="stat-label">Active Employees</span>
           </div>
-        </mat-card>
+        </div>
       </div>
 
       <div class="charts-grid">
         <mat-card class="chart-card">
-          <mat-card-header><mat-card-title>Monthly Earnings Over Time</mat-card-title></mat-card-header>
+          <div class="chart-header">
+            <h3>Monthly Earnings Over Time</h3>
+          </div>
           <mat-card-content>
             <canvas baseChart [datasets]="earningsChartData.datasets" [labels]="earningsChartData.labels"
               [options]="lineChartOptions" type="line"></canvas>
@@ -80,7 +99,9 @@ import { Payment, GodsMoney, SalaryPayment, DashboardStats } from '../../core/mo
         </mat-card>
 
         <mat-card class="chart-card">
-          <mat-card-header><mat-card-title>Earnings by Project</mat-card-title></mat-card-header>
+          <div class="chart-header">
+            <h3>Earnings by Project</h3>
+          </div>
           <mat-card-content>
             <canvas baseChart [datasets]="projectChartData.datasets" [labels]="projectChartData.labels"
               [options]="barChartOptions" type="bar"></canvas>
@@ -88,7 +109,9 @@ import { Payment, GodsMoney, SalaryPayment, DashboardStats } from '../../core/mo
         </mat-card>
 
         <mat-card class="chart-card">
-          <mat-card-header><mat-card-title>God's Money: Accumulated vs Disbursed</mat-card-title></mat-card-header>
+          <div class="chart-header">
+            <h3>God's Money: Accumulated vs Disbursed</h3>
+          </div>
           <mat-card-content>
             <canvas baseChart [datasets]="godChartData.datasets" [labels]="godChartData.labels"
               [options]="lineChartOptions" type="line"></canvas>
@@ -96,7 +119,9 @@ import { Payment, GodsMoney, SalaryPayment, DashboardStats } from '../../core/mo
         </mat-card>
 
         <mat-card class="chart-card">
-          <mat-card-header><mat-card-title>Accumulative Earnings</mat-card-title></mat-card-header>
+          <div class="chart-header">
+            <h3>Accumulative Earnings</h3>
+          </div>
           <mat-card-content>
             <canvas baseChart [datasets]="accumulativeChartData.datasets" [labels]="accumulativeChartData.labels"
               [options]="lineChartOptions" type="line"></canvas>
@@ -104,7 +129,9 @@ import { Payment, GodsMoney, SalaryPayment, DashboardStats } from '../../core/mo
         </mat-card>
 
         <mat-card class="chart-card">
-          <mat-card-header><mat-card-title>Salary Expenses by Employee</mat-card-title></mat-card-header>
+          <div class="chart-header">
+            <h3>Salary Expenses by Employee</h3>
+          </div>
           <mat-card-content>
             <canvas baseChart [datasets]="salaryByEmpChartData.datasets" [labels]="salaryByEmpChartData.labels"
               [options]="pieChartOptions" type="doughnut"></canvas>
@@ -112,7 +139,9 @@ import { Payment, GodsMoney, SalaryPayment, DashboardStats } from '../../core/mo
         </mat-card>
 
         <mat-card class="chart-card">
-          <mat-card-header><mat-card-title>Monthly Salary Expenses</mat-card-title></mat-card-header>
+          <div class="chart-header">
+            <h3>Monthly Salary Expenses</h3>
+          </div>
           <mat-card-content>
             <canvas baseChart [datasets]="salaryMonthlyChartData.datasets" [labels]="salaryMonthlyChartData.labels"
               [options]="barChartOptions" type="bar"></canvas>
@@ -120,7 +149,9 @@ import { Payment, GodsMoney, SalaryPayment, DashboardStats } from '../../core/mo
         </mat-card>
 
         <mat-card class="chart-card">
-          <mat-card-header><mat-card-title>God's Money Percentage Over Time</mat-card-title></mat-card-header>
+          <div class="chart-header">
+            <h3>God's Money Percentage Over Time</h3>
+          </div>
           <mat-card-content>
             <canvas baseChart [datasets]="godPercentChartData.datasets" [labels]="godPercentChartData.labels"
               [options]="percentChartOptions" type="line"></canvas>
@@ -128,7 +159,9 @@ import { Payment, GodsMoney, SalaryPayment, DashboardStats } from '../../core/mo
         </mat-card>
 
         <mat-card class="chart-card">
-          <mat-card-header><mat-card-title>Yearly Comparison</mat-card-title></mat-card-header>
+          <div class="chart-header">
+            <h3>Yearly Comparison</h3>
+          </div>
           <mat-card-content>
             <canvas baseChart [datasets]="yearlyChartData.datasets" [labels]="yearlyChartData.labels"
               [options]="barChartOptions" type="bar"></canvas>
@@ -139,44 +172,90 @@ import { Payment, GodsMoney, SalaryPayment, DashboardStats } from '../../core/mo
   `,
   styles: [`
     .loading { display: flex; justify-content: center; padding: 48px; }
+
+    .page-intro {
+      margin-bottom: 28px;
+    }
+    .page-intro h1 {
+      font-size: 28px; font-weight: 700; margin: 0 0 4px;
+      color: var(--text-primary); letter-spacing: -0.3px;
+    }
+    .page-intro p {
+      font-size: 14px; color: var(--text-muted); margin: 0;
+    }
+
     .stats-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
       gap: 16px;
-      margin-bottom: 24px;
+      margin-bottom: 32px;
     }
     .stat-card {
-      display: flex;
-      align-items: center;
+      display: flex; align-items: center; gap: 16px;
       padding: 20px;
-      gap: 16px;
+      background: var(--surface-card);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+      transition: box-shadow 0.2s, transform 0.2s;
     }
-    .stat-icon { font-size: 36px; width: 36px; height: 36px; }
-    .stat-icon.income { color: #2e7d32; }
-    .stat-icon.mine { color: #1565c0; }
-    .stat-icon.god { color: #f57f17; }
-    .stat-icon.salary { color: #c62828; }
-    .stat-icon.projects { color: #6a1b9a; }
-    .stat-icon.emp { color: #00838f; }
-    .stat-info { display: flex; flex-direction: column; }
-    .stat-value { font-size: 20px; font-weight: 600; }
-    .stat-label { font-size: 13px; color: #666; }
+    .stat-card:hover {
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
+    }
+    .stat-icon-wrap {
+      width: 48px; height: 48px; border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .stat-icon-wrap mat-icon {
+      font-size: 24px; width: 24px; height: 24px; color: #fff;
+    }
+    .stat-icon-wrap.green { background: linear-gradient(135deg, #0ead69, #059652); }
+    .stat-icon-wrap.blue { background: linear-gradient(135deg, #4361ee, #3651d4); }
+    .stat-icon-wrap.orange { background: linear-gradient(135deg, #f59e0b, #d97706); }
+    .stat-icon-wrap.red { background: linear-gradient(135deg, #ef4444, #dc2626); }
+    .stat-icon-wrap.purple { background: linear-gradient(135deg, #7c3aed, #6d28d9); }
+    .stat-icon-wrap.teal { background: linear-gradient(135deg, #06b6d4, #0891b2); }
+    .stat-info { display: flex; flex-direction: column; min-width: 0; }
+    .stat-value {
+      font-size: 22px; font-weight: 700; color: var(--text-primary);
+      letter-spacing: -0.5px; line-height: 1.2;
+    }
+    .stat-label {
+      font-size: 12px; color: var(--text-muted);
+      font-weight: 500; margin-top: 2px;
+    }
+
     .charts-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
-      gap: 16px;
+      gap: 20px;
     }
-    .chart-card { padding: 8px; }
-    .chart-card mat-card-content { height: 300px; position: relative; }
+    .chart-card {
+      padding: 0 !important;
+      overflow: hidden;
+    }
+    .chart-header {
+      padding: 20px 24px 0;
+    }
+    .chart-header h3 {
+      margin: 0; font-size: 15px; font-weight: 600;
+      color: var(--text-primary);
+    }
+    .chart-card mat-card-content { height: 300px; position: relative; padding: 12px 16px 16px; }
     canvas { width: 100% !important; height: 100% !important; }
+
     @media (max-width: 599px) {
-      .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
-      .stat-card { padding: 12px; gap: 8px; }
-      .stat-icon { font-size: 24px; width: 24px; height: 24px; }
-      .stat-value { font-size: 14px; }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+      .stat-card { padding: 14px; gap: 12px; }
+      .stat-icon-wrap { width: 40px; height: 40px; border-radius: 10px; }
+      .stat-icon-wrap mat-icon { font-size: 20px; width: 20px; height: 20px; }
+      .stat-value { font-size: 16px; }
       .stat-label { font-size: 11px; }
       .charts-grid { grid-template-columns: 1fr; }
       .chart-card mat-card-content { height: 250px; }
+      .page-intro h1 { font-size: 22px; }
     }
   `],
 })

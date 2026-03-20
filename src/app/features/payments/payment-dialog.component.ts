@@ -22,94 +22,105 @@ import { AttachmentManagerComponent } from '../../shared/components/attachment-m
     MatTabsModule, AttachmentManagerComponent,
   ],
   template: `
-    <h2 mat-dialog-title>{{ data.payment ? 'Edit Payment' : 'Add Payment' }}</h2>
+    <div class="dialog-header">
+      <h2 mat-dialog-title>{{ data.payment ? 'Edit Payment' : 'Add Payment' }}</h2>
+    </div>
     <mat-dialog-content>
-      <mat-tab-group>
-        <mat-tab label="Details">
-          <form [formGroup]="form" class="form-grid">
-            <mat-form-field appearance="outline">
-              <mat-label>Main Scope (Project)</mat-label>
-              <mat-select formControlName="mainScopeName">
-                @for (scope of data.mainScopes; track scope.id) {
-                  <mat-option [value]="scope.name">{{ scope.name }}</mat-option>
-                }
-              </mat-select>
-            </mat-form-field>
+      <form [formGroup]="form">
+        <mat-tab-group>
+          <mat-tab label="Details">
+            <div class="form-grid">
+              <mat-form-field appearance="outline">
+                <mat-label>Main Scope (Project)</mat-label>
+                <mat-select formControlName="mainScopeName">
+                  @for (scope of data.mainScopes; track scope.id) {
+                    <mat-option [value]="scope.name">{{ scope.name }}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
 
-            <mat-form-field appearance="outline">
-              <mat-label>Sub Scope</mat-label>
-              <input matInput formControlName="subScope" />
-            </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>Sub Scope</mat-label>
+                <input matInput formControlName="subScope" />
+              </mat-form-field>
 
-            <mat-form-field appearance="outline">
-              <mat-label>Date</mat-label>
-              <input matInput [matDatepicker]="picker" formControlName="date" />
-              <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-              <mat-datepicker #picker startView="year"></mat-datepicker>
-            </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>Date</mat-label>
+                <input matInput [matDatepicker]="picker" formControlName="date" />
+                <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                <mat-datepicker #picker startView="year"></mat-datepicker>
+              </mat-form-field>
 
-            <mat-form-field appearance="outline">
-              <mat-label>Received (EGP)</mat-label>
-              <input matInput type="number" formControlName="receivedEGP" />
-            </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>Received (EGP)</mat-label>
+                <input matInput type="number" formControlName="receivedEGP" />
+              </mat-form-field>
 
-            <mat-form-field appearance="outline">
-              <mat-label>Mine (EGP)</mat-label>
-              <input matInput type="number" formControlName="mineEGP" />
-            </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>Mine (EGP)</mat-label>
+                <input matInput type="number" formControlName="mineEGP" />
+              </mat-form-field>
 
-            <mat-form-field appearance="outline">
-              <mat-label>God Amount</mat-label>
-              <input matInput type="number" formControlName="godAmount" />
-            </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>God Amount</mat-label>
+                <input matInput type="number" formControlName="godAmount" />
+              </mat-form-field>
 
-            <mat-form-field appearance="outline" class="full-width">
-              <mat-label>Notes</mat-label>
-              <textarea matInput formControlName="notes" rows="2"></textarea>
-            </mat-form-field>
-          </form>
-        </mat-tab>
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Notes</mat-label>
+                <textarea matInput formControlName="notes" rows="2"></textarea>
+              </mat-form-field>
+            </div>
+          </mat-tab>
 
-        <mat-tab label="Others (Splits)">
-          <div class="splits-section" formArrayName="others" [formGroup]="form">
-            @for (split of othersArray.controls; track $index; let i = $index) {
-              <div class="split-row" [formGroupName]="i">
-                <mat-form-field appearance="outline">
-                  <mat-label>Name</mat-label>
-                  <input matInput formControlName="personName" />
-                </mat-form-field>
-                <mat-form-field appearance="outline">
-                  <mat-label>Amount</mat-label>
-                  <input matInput type="number" formControlName="amount" />
-                </mat-form-field>
-                <button mat-icon-button color="warn" (click)="removeSplit(i)">
-                  <mat-icon>remove_circle</mat-icon>
-                </button>
-              </div>
-            }
-            <button mat-stroked-button (click)="addSplit()">
-              <mat-icon>add</mat-icon> Add Split
-            </button>
-          </div>
-        </mat-tab>
+          <mat-tab label="Others (Splits)">
+            <div class="splits-section" formArrayName="others">
+              @for (split of othersArray.controls; track $index; let i = $index) {
+                <div class="split-row" [formGroupName]="i">
+                  <mat-form-field appearance="outline">
+                    <mat-label>Name</mat-label>
+                    <input matInput formControlName="personName" />
+                  </mat-form-field>
+                  <mat-form-field appearance="outline">
+                    <mat-label>Amount</mat-label>
+                    <input matInput type="number" formControlName="amount" />
+                  </mat-form-field>
+                  <button mat-icon-button color="warn" (click)="removeSplit(i)">
+                    <mat-icon>remove_circle</mat-icon>
+                  </button>
+                </div>
+              }
+              <button mat-stroked-button (click)="addSplit()">
+                <mat-icon>add</mat-icon> Add Split
+              </button>
+            </div>
+          </mat-tab>
 
-        <mat-tab label="Attachments">
-          <div class="attachment-tab">
-            <app-attachment-manager
-              [attachments]="attachments"
-              folder="payments"
-              (attachmentsChange)="attachments = $event"
-            ></app-attachment-manager>
-          </div>
-        </mat-tab>
-      </mat-tab-group>
+          <mat-tab label="Attachments">
+            <div class="attachment-tab">
+              <app-attachment-manager
+                [attachments]="attachments"
+                folder="payments"
+                (attachmentsChange)="attachments = $event"
+              ></app-attachment-manager>
+            </div>
+          </mat-tab>
+        </mat-tab-group>
+      </form>
     </mat-dialog-content>
     <mat-dialog-actions align="end">
-      <button mat-button mat-dialog-close>Cancel</button>
-      <button mat-raised-button color="primary" (click)="save()" [disabled]="form.invalid">Save</button>
+      <button mat-button mat-dialog-close class="cancel-btn">Cancel</button>
+      <button mat-raised-button color="primary" (click)="save()" [disabled]="form.invalid" class="save-btn">Save</button>
     </mat-dialog-actions>
   `,
   styles: [`
+    .dialog-header {
+      padding: 4px 0 0;
+    }
+    .dialog-header h2 {
+      font-size: 20px; font-weight: 700; letter-spacing: -0.3px;
+      color: var(--text-primary);
+    }
     .form-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -120,6 +131,8 @@ import { AttachmentManagerComponent } from '../../shared/components/attachment-m
     .split-row { display: flex; gap: 8px; align-items: center; margin-top: 8px; }
     .split-row mat-form-field { flex: 1; }
     .splits-section, .attachment-tab { padding: 16px 0; }
+    .save-btn { border-radius: 10px !important; font-weight: 600 !important; padding: 0 24px !important; }
+    .cancel-btn { border-radius: 10px !important; }
     @media (max-width: 599px) {
       .form-grid { grid-template-columns: 1fr; }
       .full-width { grid-column: span 1; }

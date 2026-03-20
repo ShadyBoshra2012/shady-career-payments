@@ -1,9 +1,30 @@
 // Include theming for Angular Material with `mat.theme()`.
-// This Sass mixin will define CSS variables that are used for styling Angular Material
-// components according to the Material 3 design spec.
-// Learn more about theming and how to use it for your application's
-// custom components at https://material.angular.dev/guide/theming
 @use '@angular/material' as mat;
+
+:root {
+  --surface: #f8f9fc;
+  --surface-card: #ffffff;
+  --surface-hover: #f1f3f8;
+  --border: #e8eaf0;
+  --text-primary: #1a1d2e;
+  --text-secondary: #5f6578;
+  --text-muted: #8b90a5;
+  --accent-blue: #4361ee;
+  --accent-blue-soft: rgba(67, 97, 238, 0.08);
+  --accent-green: #0ead69;
+  --accent-orange: #f59e0b;
+  --accent-red: #ef4444;
+  --accent-purple: #7c3aed;
+  --accent-teal: #06b6d4;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.06);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.06), 0 1px 4px rgba(0,0,0,0.04);
+  --shadow-lg: 0 10px 30px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.04);
+  --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
 
 html {
   height: 100%;
@@ -13,63 +34,99 @@ html {
         primary: mat.$azure-palette,
         tertiary: mat.$blue-palette,
       ),
-      typography: Roboto,
+      typography: Inter,
       density: 0,
     )
   );
 }
 
 body {
-  // Default the application to a light color theme. This can be changed to
-  // `dark` to enable the dark color theme, or to `light dark` to defer to the
-  // user's system settings.
   color-scheme: light;
-
-  // Set a default background, font and text colors for the application using
-  // Angular Material's system-level CSS variables. Learn more about these
-  // variables at https://material.angular.dev/guide/system-variables
-  background-color: var(--mat-sys-surface);
-  color: var(--mat-sys-on-surface);
-  font: var(--mat-sys-body-medium);
-
-  // Reset the user agent margin.
+  background-color: var(--surface);
+  color: var(--text-primary);
+  font-family: 'Inter', 'Roboto', sans-serif;
   margin: 0;
   height: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
-/* You can add global styles to this file, and also import other style files */
 
-// Global page padding
+/* Global page padding */
 .mat-drawer-content {
   padding: 24px;
-
-  @media (max-width: 599px) {
-    padding: 12px;
-  }
+  @media (max-width: 599px) { padding: 12px; }
 }
 
-// Responsive table wrapper
-mat-card {
+/* Modern card styling */
+mat-card, .mat-mdc-card {
   overflow-x: auto;
+  border-radius: var(--radius-lg) !important;
+  box-shadow: var(--shadow-sm) !important;
+  border: 1px solid var(--border);
+  transition: box-shadow var(--transition), transform var(--transition);
 }
 
+/* Modern table styling */
 table.mat-mdc-table {
   min-width: 600px;
+  border-collapse: separate;
+  border-spacing: 0;
 }
 
-// Page header
+.mat-mdc-header-row {
+  background: var(--surface) !important;
+}
+
+.mat-mdc-header-cell {
+  font-weight: 600 !important;
+  font-size: 12px !important;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted) !important;
+  border-bottom: 2px solid var(--border) !important;
+}
+
+.mat-mdc-row {
+  transition: background var(--transition);
+  &:hover { background: var(--surface-hover) !important; }
+}
+
+.mat-mdc-cell {
+  font-size: 14px;
+  color: var(--text-primary);
+  border-bottom-color: var(--border) !important;
+}
+
+/* Page header */
 .page-header h1 {
   margin: 0;
-  font-size: 28px;
-  font-weight: 500;
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.3px;
 }
 
-// Stat cards
+/* Stat cards  */
 .stats-row .stat-label {
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  font-size: 12px;
+  color: var(--text-muted);
+  font-weight: 600;
 }
 
-// Dialog widths on mobile
+/* Modern form fields */
+.mat-mdc-form-field {
+  .mdc-text-field--outlined .mdc-notched-outline {
+    .mdc-notched-outline__leading,
+    .mdc-notched-outline__notch,
+    .mdc-notched-outline__trailing {
+      border-color: var(--border);
+    }
+  }
+}
+
+/* Dialog widths on mobile */
 @media (max-width: 599px) {
   .cdk-overlay-pane {
     max-width: 95vw !important;
@@ -77,7 +134,64 @@ table.mat-mdc-table {
   }
 }
 
-// Chart containers
+/* Modern dialog styling */
+.mat-mdc-dialog-container .mdc-dialog__surface {
+  border-radius: var(--radius-xl) !important;
+}
+
+/* Chart containers */
 canvas {
   max-height: 300px;
 }
+
+/* Paginator */
+.mat-mdc-paginator {
+  background: transparent !important;
+  border-top: 1px solid var(--border);
+}
+
+/* Expansion panels */
+.mat-expansion-panel {
+  border-radius: var(--radius-md) !important;
+  box-shadow: var(--shadow-sm) !important;
+  border: 1px solid var(--border);
+  margin-bottom: 8px !important;
+  &::before { display: none !important; }
+}
+
+/* Snackbar */
+.mat-mdc-snack-bar-container {
+  border-radius: var(--radius-md) !important;
+}
+
+/* Buttons */
+.mat-mdc-raised-button, .mat-mdc-unelevated-button {
+  border-radius: var(--radius-sm) !important;
+  font-weight: 600 !important;
+  letter-spacing: 0;
+}
+
+.mat-mdc-fab, .mat-mdc-mini-fab {
+  box-shadow: var(--shadow-md) !important;
+}
+
+.mat-mdc-fab.mat-mdc-extended-fab {
+  border-radius: var(--radius-md) !important;
+}
+
+/* Chips */
+.mat-mdc-chip {
+  border-radius: var(--radius-sm) !important;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: #c5c9d6;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover { background: #a0a5b8; }

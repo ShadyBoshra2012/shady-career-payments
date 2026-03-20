@@ -20,7 +20,9 @@ import { AttachmentManagerComponent } from '../../shared/components/attachment-m
     AttachmentManagerComponent,
   ],
   template: `
-    <h2 mat-dialog-title>{{ data.item ? 'Edit' : 'Add' }} God's Money Disbursement</h2>
+    <div class="dialog-header">
+      <h2 mat-dialog-title>{{ data.item ? 'Edit' : 'Add' }} God's Money Disbursement</h2>
+    </div>
     <mat-dialog-content>
       <mat-tab-group>
         <mat-tab label="Details">
@@ -75,13 +77,16 @@ import { AttachmentManagerComponent } from '../../shared/components/attachment-m
       </mat-tab-group>
     </mat-dialog-content>
     <mat-dialog-actions align="end">
-      <button mat-button mat-dialog-close>Cancel</button>
-      <button mat-raised-button color="primary" (click)="save()" [disabled]="form.invalid">Save</button>
+      <button mat-button mat-dialog-close class="cancel-btn">Cancel</button>
+      <button mat-raised-button color="primary" (click)="save()" [disabled]="form.invalid" class="save-btn">Save</button>
     </mat-dialog-actions>
   `,
   styles: [`
+    .dialog-header h2 { font-size: 20px; font-weight: 700; letter-spacing: -0.3px; color: var(--text-primary); }
     .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 16px 0; }
     .full-width { grid-column: span 2; }
+    .save-btn { border-radius: 10px !important; font-weight: 600 !important; padding: 0 24px !important; }
+    .cancel-btn { border-radius: 10px !important; }
     @media (max-width: 599px) { .form-grid { grid-template-columns: 1fr; } .full-width { grid-column: span 1; } }
   `],
 })
