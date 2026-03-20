@@ -8,6 +8,7 @@ import { BaseChartDirective } from 'ng2-charts';
 import { ChartConfiguration } from 'chart.js';
 import { combineLatest } from 'rxjs';
 import { DataService } from '../../core/services/data.service';
+import { AmountVisibilityService } from '../../core/services/amount-visibility.service';
 import { Payment, GodsMoney, SalaryPayment, DashboardStats } from '../../core/models';
 
 @Component({
@@ -36,7 +37,7 @@ import { Payment, GodsMoney, SalaryPayment, DashboardStats } from '../../core/mo
             <mat-icon>trending_up</mat-icon>
           </div>
           <div class="stat-info">
-            <span class="stat-value">{{ stats.totalReceivedEGP | number:'1.0-0' }}</span>
+            <span class="stat-value">{{ (amountVis.hidden$ | async) ? '•••' : (stats.totalReceivedEGP | number:'1.0-0') }}</span>
             <span class="stat-label">Total Received (EGP)</span>
           </div>
         </div>
@@ -45,7 +46,7 @@ import { Payment, GodsMoney, SalaryPayment, DashboardStats } from '../../core/mo
             <mat-icon>account_balance</mat-icon>
           </div>
           <div class="stat-info">
-            <span class="stat-value">{{ stats.totalMineEGP | number:'1.0-0' }}</span>
+            <span class="stat-value">{{ (amountVis.hidden$ | async) ? '•••' : (stats.totalMineEGP | number:'1.0-0') }}</span>
             <span class="stat-label">My Earnings (EGP)</span>
           </div>
         </div>
@@ -54,7 +55,7 @@ import { Payment, GodsMoney, SalaryPayment, DashboardStats } from '../../core/mo
             <mat-icon>volunteer_activism</mat-icon>
           </div>
           <div class="stat-info">
-            <span class="stat-value">{{ stats.totalGodMoney | number:'1.0-0' }}</span>
+            <span class="stat-value">{{ (amountVis.hidden$ | async) ? '•••' : (stats.totalGodMoney | number:'1.0-0') }}</span>
             <span class="stat-label">God's Money Accumulated</span>
           </div>
         </div>
@@ -63,7 +64,7 @@ import { Payment, GodsMoney, SalaryPayment, DashboardStats } from '../../core/mo
             <mat-icon>paid</mat-icon>
           </div>
           <div class="stat-info">
-            <span class="stat-value">{{ stats.totalSalariesPaid | number:'1.0-0' }}</span>
+            <span class="stat-value">{{ (amountVis.hidden$ | async) ? '•••' : (stats.totalSalariesPaid | number:'1.0-0') }}</span>
             <span class="stat-label">Salaries Paid (EGP)</span>
           </div>
         </div>
@@ -262,6 +263,7 @@ import { Payment, GodsMoney, SalaryPayment, DashboardStats } from '../../core/mo
 export class DashboardComponent implements OnInit {
   private dataService = inject(DataService);
   private cdr = inject(ChangeDetectorRef);
+  amountVis = inject(AmountVisibilityService);
 
   loading = true;
   stats: DashboardStats = {

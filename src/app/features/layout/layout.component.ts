@@ -8,8 +8,10 @@ import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatMenuModule } from '@angular/material/menu';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { Observable, map, shareReplay } from 'rxjs';
 import { AuthService } from '../../core/services/auth.service';
+import { AmountVisibilityService } from '../../core/services/amount-visibility.service';
 
 @Component({
   selector: 'app-layout',
@@ -25,6 +27,7 @@ import { AuthService } from '../../core/services/auth.service';
     MatIconModule,
     MatButtonModule,
     MatMenuModule,
+    MatSlideToggleModule,
   ],
   template: `
     <mat-sidenav-container class="sidenav-container">
@@ -57,6 +60,15 @@ import { AuthService } from '../../core/services/auth.service';
             </a>
           }
         </mat-nav-list>
+        <div class="hide-amounts-toggle">
+          <mat-icon class="toggle-icon">visibility_off</mat-icon>
+          <span class="toggle-label">Hide Amounts</span>
+          <mat-slide-toggle
+            [checked]="amountVis.hidden"
+            (change)="amountVis.toggle()"
+            color="primary"
+          ></mat-slide-toggle>
+        </div>
         <div class="sidenav-footer">
           <small>v1.0 &middot; Shady Boshra</small>
         </div>
@@ -166,6 +178,24 @@ import { AuthService } from '../../core/services/auth.service';
       border-top: 1px solid rgba(255,255,255,0.06);
     }
 
+    .hide-amounts-toggle {
+      display: flex; align-items: center; gap: 10px;
+      padding: 14px 20px;
+      margin: 8px 12px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    .toggle-icon {
+      font-size: 18px; width: 18px; height: 18px;
+      color: rgba(255,255,255,0.5);
+    }
+    .toggle-label {
+      font-size: 13px; font-weight: 500;
+      color: rgba(255,255,255,0.7);
+      flex: 1;
+    }
+
     .toolbar {
       position: sticky;
       top: 0;
@@ -207,6 +237,7 @@ import { AuthService } from '../../core/services/auth.service';
 })
 export class LayoutComponent {
   auth = inject(AuthService);
+  amountVis = inject(AmountVisibilityService);
   private router = inject(Router);
   private breakpointObserver = inject(BreakpointObserver);
 

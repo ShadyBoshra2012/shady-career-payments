@@ -9,6 +9,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { DataService } from '../../core/services';
+import { AmountVisibilityService } from '../../core/services/amount-visibility.service';
 import { GodsMoney } from '../../core/models';
 import { GodsMoneyDialogComponent } from './gods-money-dialog.component';
 
@@ -36,7 +37,7 @@ import { GodsMoneyDialogComponent } from './gods-money-dialog.component';
           <mat-icon>savings</mat-icon>
         </div>
         <div class="stat-info">
-          <span class="stat-value">{{ totalAccumulated | number:'1.0-0' }}</span>
+          <span class="stat-value">{{ (amountVis.hidden$ | async) ? '•••' : (totalAccumulated | number:'1.0-0') }}</span>
           <span class="stat-label">Total Accumulated (EGP)</span>
         </div>
       </div>
@@ -45,7 +46,7 @@ import { GodsMoneyDialogComponent } from './gods-money-dialog.component';
           <mat-icon>send</mat-icon>
         </div>
         <div class="stat-info">
-          <span class="stat-value">{{ totalDisbursed | number:'1.0-0' }}</span>
+          <span class="stat-value">{{ (amountVis.hidden$ | async) ? '•••' : (totalDisbursed | number:'1.0-0') }}</span>
           <span class="stat-label">Total Disbursed (EGP)</span>
         </div>
       </div>
@@ -54,7 +55,7 @@ import { GodsMoneyDialogComponent } from './gods-money-dialog.component';
           <mat-icon>account_balance</mat-icon>
         </div>
         <div class="stat-info">
-          <span class="stat-value" [class.negative]="balance < 0">{{ balance | number:'1.0-0' }}</span>
+          <span class="stat-value" [class.negative]="balance < 0">{{ (amountVis.hidden$ | async) ? '•••' : (balance | number:'1.0-0') }}</span>
           <span class="stat-label">Remaining Balance (EGP)</span>
         </div>
       </div>
@@ -72,7 +73,7 @@ import { GodsMoneyDialogComponent } from './gods-money-dialog.component';
         </ng-container>
         <ng-container matColumnDef="priceEGP">
           <th mat-header-cell *matHeaderCellDef mat-sort-header>Amount (EGP)</th>
-          <td mat-cell *matCellDef="let row" class="num-cell">{{ row.priceEGP | number:'1.0-0' }}</td>
+          <td mat-cell *matCellDef="let row" class="num-cell">{{ (amountVis.hidden$ | async) ? '•••' : (row.priceEGP | number:'1.0-0') }}</td>
         </ng-container>
         <ng-container matColumnDef="sendingDate">
           <th mat-header-cell *matHeaderCellDef mat-sort-header>Sending Date</th>
@@ -148,6 +149,7 @@ export class GodsMoneyComponent implements OnInit {
   private cdr = inject(ChangeDetectorRef);
   private dialog = inject(MatDialog);
   private snackBar = inject(MatSnackBar);
+  amountVis = inject(AmountVisibilityService);
 
   items: GodsMoney[] = [];
   sortedItems: GodsMoney[] = [];

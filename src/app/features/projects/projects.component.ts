@@ -10,6 +10,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { DataService } from '../../core/services/data.service';
+import { AmountVisibilityService } from '../../core/services/amount-visibility.service';
 import { MainScope, Payment } from '../../core/models';
 import { ProjectDialogComponent } from './project-dialog.component';
 
@@ -64,7 +65,7 @@ interface ProjectRow extends MainScope {
             <mat-icon>account_balance_wallet</mat-icon>
           </div>
           <div class="stat-body">
-            <span class="stat-value">{{ totalRevenue | number:'1.0-0' }}</span>
+            <span class="stat-value">{{ (amountVis.hidden$ | async) ? '•••' : (totalRevenue | number:'1.0-0') }}</span>
             <span class="stat-label">Total Revenue (EGP)</span>
           </div>
         </div>
@@ -92,7 +93,7 @@ interface ProjectRow extends MainScope {
           </ng-container>
           <ng-container matColumnDef="totalReceived">
             <th mat-header-cell *matHeaderCellDef>Total Received</th>
-            <td mat-cell *matCellDef="let p" class="num-cell">{{ p.totalReceived | number:'1.0-0' }} EGP</td>
+            <td mat-cell *matCellDef="let p" class="num-cell">{{ (amountVis.hidden$ | async) ? '•••' : ((p.totalReceived | number:'1.0-0') + ' EGP') }}</td>
           </ng-container>
           <ng-container matColumnDef="notes">
             <th mat-header-cell *matHeaderCellDef>Notes</th>
@@ -181,6 +182,7 @@ interface ProjectRow extends MainScope {
 export class ProjectsComponent implements OnInit {
   private dataService = inject(DataService);
   private cdr = inject(ChangeDetectorRef);
+  amountVis = inject(AmountVisibilityService);
   private dialog = inject(MatDialog);
   private snackBar = inject(MatSnackBar);
 

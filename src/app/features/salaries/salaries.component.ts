@@ -11,6 +11,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { DataService } from '../../core/services';
+import { AmountVisibilityService } from '../../core/services/amount-visibility.service';
 import { Employee, SalaryPayment } from '../../core/models';
 import { SalaryDialogComponent } from './salary-dialog.component';
 
@@ -48,7 +49,7 @@ import { SalaryDialogComponent } from './salary-dialog.component';
           <mat-icon>paid</mat-icon>
         </div>
         <div class="stat-info">
-          <span class="stat-value">{{ totalAmount | number:'1.0-0' }}</span>
+          <span class="stat-value">{{ (amountVis.hidden$ | async) ? '•••' : (totalAmount | number:'1.0-0') }}</span>
           <span class="stat-label">Total Amount (EGP)</span>
         </div>
       </div>
@@ -78,7 +79,7 @@ import { SalaryDialogComponent } from './salary-dialog.component';
         </ng-container>
         <ng-container matColumnDef="amount">
           <th mat-header-cell *matHeaderCellDef mat-sort-header>Amount (EGP)</th>
-          <td mat-cell *matCellDef="let row" class="num-cell">{{ row.amount | number:'1.0-0' }}</td>
+          <td mat-cell *matCellDef="let row" class="num-cell">{{ (amountVis.hidden$ | async) ? '•••' : (row.amount | number:'1.0-0') }}</td>
         </ng-container>
         <ng-container matColumnDef="comments">
           <th mat-header-cell *matHeaderCellDef>Comments</th>
@@ -154,6 +155,7 @@ export class SalariesComponent implements OnInit {
   private cdr = inject(ChangeDetectorRef);
   private dialog = inject(MatDialog);
   private snackBar = inject(MatSnackBar);
+  amountVis = inject(AmountVisibilityService);
 
   items: SalaryPayment[] = [];
   filteredItems: SalaryPayment[] = [];

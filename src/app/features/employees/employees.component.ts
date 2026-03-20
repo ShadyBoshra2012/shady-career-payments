@@ -8,6 +8,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { DataService } from '../../core/services';
+import { AmountVisibilityService } from '../../core/services/amount-visibility.service';
 import { Employee } from '../../core/models';
 import { EmployeeDialogComponent } from './employee-dialog.component';
 
@@ -41,7 +42,7 @@ import { EmployeeDialogComponent } from './employee-dialog.component';
         </ng-container>
         <ng-container matColumnDef="baseSalary">
           <th mat-header-cell *matHeaderCellDef mat-sort-header>Base Salary</th>
-          <td mat-cell *matCellDef="let row" class="num-cell">{{ row.baseSalary | number:'1.0-0' }} EGP</td>
+          <td mat-cell *matCellDef="let row" class="num-cell">{{ (amountVis.hidden$ | async) ? '•••' : ((row.baseSalary | number:'1.0-0') + ' EGP') }}</td>
         </ng-container>
         <ng-container matColumnDef="paymentMethod">
           <th mat-header-cell *matHeaderCellDef>Payment Method</th>
@@ -112,6 +113,7 @@ export class EmployeesComponent implements OnInit {
   private cdr = inject(ChangeDetectorRef);
   private dialog = inject(MatDialog);
   private snackBar = inject(MatSnackBar);
+  amountVis = inject(AmountVisibilityService);
 
   items: Employee[] = [];
   sortedItems: Employee[] = [];
