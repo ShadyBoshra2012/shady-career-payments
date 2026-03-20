@@ -48,36 +48,66 @@ interface ProjectGroup {
     } @else {
       <div class="header-row">
         <mat-form-field appearance="outline" class="filter-field">
-          <mat-label>Search</mat-label>
-          <input matInput (input)="applyFilter($event)" placeholder="Filter payments..." />
+          <mat-label>Search payments...</mat-label>
+          <input matInput (input)="applyFilter($event)" />
           <mat-icon matSuffix>search</mat-icon>
         </mat-form-field>
-        <button mat-raised-button color="primary" (click)="openDialog()">
-          <mat-icon>add</mat-icon> Add Payment
+        <button mat-fab extended color="primary" (click)="openDialog()">
+          <mat-icon>add</mat-icon> New Payment
         </button>
       </div>
 
-      <div class="summary-row">
-        <mat-card class="mini-stat">
-          <strong>{{ totalCount }}</strong> records |
-          Received: <strong>{{ totalReceived | number:'1.0-0' }} EGP</strong> |
-          Mine: <strong>{{ totalMine | number:'1.0-0' }} EGP</strong> |
-          God: <strong>{{ totalGod | number:'1.0-0' }} EGP</strong>
-        </mat-card>
+      <div class="stats-grid">
+        <div class="stat-card received">
+          <mat-icon>trending_up</mat-icon>
+          <div class="stat-body">
+            <span class="stat-value">{{ totalReceived | number:'1.0-0' }}</span>
+            <span class="stat-unit">EGP</span>
+          </div>
+          <span class="stat-label">Total Received</span>
+        </div>
+        <div class="stat-card mine">
+          <mat-icon>account_balance_wallet</mat-icon>
+          <div class="stat-body">
+            <span class="stat-value">{{ totalMine | number:'1.0-0' }}</span>
+            <span class="stat-unit">EGP</span>
+          </div>
+          <span class="stat-label">My Earnings</span>
+        </div>
+        <div class="stat-card god">
+          <mat-icon>volunteer_activism</mat-icon>
+          <div class="stat-body">
+            <span class="stat-value">{{ totalGod | number:'1.0-0' }}</span>
+            <span class="stat-unit">EGP</span>
+          </div>
+          <span class="stat-label">God's Money</span>
+        </div>
+        <div class="stat-card count">
+          <mat-icon>receipt_long</mat-icon>
+          <div class="stat-body">
+            <span class="stat-value">{{ totalCount }}</span>
+          </div>
+          <span class="stat-label">Records</span>
+        </div>
       </div>
 
+      <h3 class="section-title">Projects ({{ projectGroups.length }})</h3>
+
       <mat-accordion multi>
-        @for (group of projectGroups; track group.scopeId) {
-          <mat-expansion-panel>
+        @for (group of projectGroups; track group.scopeId; let i = $index) {
+          <mat-expansion-panel class="project-panel">
             <mat-expansion-panel-header>
               <mat-panel-title>
-                {{ group.scopeName }}
+                <span class="project-rank">{{ i + 1 }}</span>
+                <span class="project-name">{{ group.scopeName }}</span>
                 <span class="badge">{{ group.count }}</span>
               </mat-panel-title>
               <mat-panel-description>
-                Received: {{ group.totalReceived | number:'1.0-0' }} EGP |
-                Mine: {{ group.totalMine | number:'1.0-0' }} EGP |
-                God: {{ group.totalGod | number:'1.0-0' }} EGP
+                <div class="panel-stats">
+                  <span class="chip received-chip">{{ group.totalReceived | number:'1.0-0' }} EGP</span>
+                  <span class="chip mine-chip">{{ group.totalMine | number:'1.0-0' }} EGP</span>
+                  <span class="chip god-chip">{{ group.totalGod | number:'1.0-0' }} EGP</span>
+                </div>
               </mat-panel-description>
             </mat-expansion-panel-header>
 
@@ -92,25 +122,25 @@ interface ProjectGroup {
                   <td mat-cell *matCellDef="let p">{{ p.date | date:'MMM yyyy' }}</td>
                 </ng-container>
                 <ng-container matColumnDef="receivedEGP">
-                  <th mat-header-cell *matHeaderCellDef>Received (EGP)</th>
-                  <td mat-cell *matCellDef="let p">{{ p.receivedEGP | number:'1.0-0' }}</td>
+                  <th mat-header-cell *matHeaderCellDef>Received</th>
+                  <td mat-cell *matCellDef="let p" class="num-cell">{{ p.receivedEGP | number:'1.0-0' }}</td>
                 </ng-container>
                 <ng-container matColumnDef="mineEGP">
-                  <th mat-header-cell *matHeaderCellDef>Mine (EGP)</th>
-                  <td mat-cell *matCellDef="let p">{{ p.mineEGP | number:'1.0-0' }}</td>
+                  <th mat-header-cell *matHeaderCellDef>Mine</th>
+                  <td mat-cell *matCellDef="let p" class="num-cell">{{ p.mineEGP | number:'1.0-0' }}</td>
                 </ng-container>
                 <ng-container matColumnDef="godAmount">
                   <th mat-header-cell *matHeaderCellDef>God</th>
-                  <td mat-cell *matCellDef="let p">{{ p.godAmount | number:'1.0-0' }}</td>
+                  <td mat-cell *matCellDef="let p" class="num-cell">{{ p.godAmount | number:'1.0-0' }}</td>
                 </ng-container>
                 <ng-container matColumnDef="godPercentage">
                   <th mat-header-cell *matHeaderCellDef>God %</th>
-                  <td mat-cell *matCellDef="let p">{{ p.godPercentage | number:'1.1-1' }}%</td>
+                  <td mat-cell *matCellDef="let p" class="num-cell">{{ p.godPercentage | number:'1.1-1' }}%</td>
                 </ng-container>
                 <ng-container matColumnDef="actions">
-                  <th mat-header-cell *matHeaderCellDef>Actions</th>
+                  <th mat-header-cell *matHeaderCellDef></th>
                   <td mat-cell *matCellDef="let p">
-                    <button mat-icon-button color="primary" (click)="openDialog(p)" matTooltip="Edit">
+                    <button mat-icon-button (click)="openDialog(p)" matTooltip="Edit">
                       <mat-icon>edit</mat-icon>
                     </button>
                     <button mat-icon-button color="warn" (click)="deletePayment(p)" matTooltip="Delete">
@@ -130,27 +160,82 @@ interface ProjectGroup {
   `,
   styles: [`
     .loading { display: flex; justify-content: center; padding: 48px; }
-    .header-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-bottom: 12px; }
-    .filter-field { flex: 1; min-width: 180px; }
-    .summary-row { margin-bottom: 16px; }
-    .mini-stat { padding: 12px 16px; font-size: 14px; }
-    .table-container { overflow-x: auto; }
-    table { width: 100%; }
-    th, td { white-space: nowrap; }
+
+    .header-row {
+      display: flex; flex-wrap: wrap; gap: 16px;
+      align-items: center; margin-bottom: 20px;
+    }
+    .filter-field { flex: 1; min-width: 200px; }
+
+    /* ---- Summary stat cards ---- */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px; margin-bottom: 28px;
+    }
+    .stat-card {
+      border-radius: 16px; padding: 20px;
+      display: flex; flex-direction: column; gap: 4px;
+      color: #fff; position: relative; overflow: hidden;
+    }
+    .stat-card mat-icon {
+      font-size: 32px; width: 32px; height: 32px; opacity: .85;
+    }
+    .stat-body { display: flex; align-items: baseline; gap: 4px; }
+    .stat-value { font-size: 26px; font-weight: 700; letter-spacing: -0.5px; }
+    .stat-unit { font-size: 14px; font-weight: 500; opacity: .8; }
+    .stat-label { font-size: 13px; opacity: .8; font-weight: 500; }
+    .stat-card.received { background: linear-gradient(135deg, #1e88e5, #1565c0); }
+    .stat-card.mine { background: linear-gradient(135deg, #43a047, #2e7d32); }
+    .stat-card.god { background: linear-gradient(135deg, #fb8c00, #ef6c00); }
+    .stat-card.count { background: linear-gradient(135deg, #7e57c2, #5e35b1); }
+
+    /* ---- Section title ---- */
+    .section-title {
+      font-size: 16px; font-weight: 600; color: #444;
+      margin: 0 0 12px 4px;
+    }
+
+    /* ---- Project panels ---- */
+    .project-panel { margin-bottom: 6px; border-radius: 12px !important; }
+    .project-rank {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 26px; height: 26px; border-radius: 50%;
+      background: #e3f2fd; color: #1565c0;
+      font-size: 13px; font-weight: 700; margin-right: 10px; flex-shrink: 0;
+    }
+    .project-name { font-weight: 600; font-size: 15px; }
     .badge {
       display: inline-flex; align-items: center; justify-content: center;
       background: #1565c0; color: #fff; border-radius: 12px;
-      font-size: 12px; min-width: 22px; height: 22px; padding: 0 6px; margin-left: 8px;
+      font-size: 11px; min-width: 22px; height: 20px; padding: 0 7px; margin-left: 8px;
+      font-weight: 600;
     }
-    mat-expansion-panel { margin-bottom: 4px; }
-    ::ng-deep .mat-expansion-panel-header-description {
-      justify-content: flex-end;
-      font-size: 13px;
+    .panel-stats { display: flex; gap: 8px; flex-wrap: wrap; }
+    .chip {
+      display: inline-block; padding: 3px 10px; border-radius: 20px;
+      font-size: 12px; font-weight: 600; white-space: nowrap;
     }
+    .received-chip { background: #e3f2fd; color: #1565c0; }
+    .mine-chip { background: #e8f5e9; color: #2e7d32; }
+    .god-chip { background: #fff3e0; color: #e65100; }
+
+    /* ---- Table inside panels ---- */
+    .table-container { overflow-x: auto; margin-top: 8px; }
+    table { width: 100%; }
+    th { font-weight: 600 !important; font-size: 13px; color: #555; }
+    td { font-size: 14px; }
+    .num-cell { font-variant-numeric: tabular-nums; }
+    tr.mat-mdc-row:hover { background: #f5f5f5; }
+
     @media (max-width: 599px) {
       .header-row { flex-direction: column; }
       .filter-field { min-width: 100%; }
-      ::ng-deep .mat-expansion-panel-header-description { display: none !important; }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+      .stat-value { font-size: 20px; }
+      .stat-card { padding: 14px; }
+      .panel-stats { display: none; }
+      .project-rank { width: 22px; height: 22px; font-size: 11px; }
     }
   `],
 })

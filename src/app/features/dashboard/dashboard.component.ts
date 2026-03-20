@@ -43,8 +43,8 @@ import { Payment, GodsMoney, SalaryPayment, DashboardStats } from '../../core/mo
         <mat-card class="stat-card">
           <mat-icon class="stat-icon god">volunteer_activism</mat-icon>
           <div class="stat-info">
-            <span class="stat-value">{{ stats.godMoneyBalance | number:'1.0-0' }} EGP</span>
-            <span class="stat-label">God's Money Balance</span>
+            <span class="stat-value">{{ stats.totalGodMoney | number:'1.0-0' }} EGP</span>
+            <span class="stat-label">God's Money Accumulated</span>
           </div>
         </mat-card>
         <mat-card class="stat-card">
