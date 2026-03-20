@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormArray, Validators } from '@angular/forms';
 import { MatTableModule } from '@angular/material/table';
@@ -142,6 +142,7 @@ import { PaymentDialogComponent } from './payment-dialog.component';
 })
 export class PaymentsComponent implements OnInit {
   private dataService = inject(DataService);
+  private cdr = inject(ChangeDetectorRef);
   private dialog = inject(MatDialog);
   private snackBar = inject(MatSnackBar);
 
@@ -162,11 +163,12 @@ export class PaymentsComponent implements OnInit {
   totalGod = 0;
 
   ngOnInit() {
-    this.dataService.getMainScopes().subscribe((s) => (this.mainScopes = s));
+    this.dataService.getMainScopes().subscribe((s) => { this.mainScopes = s; this.cdr.detectChanges(); });
     this.dataService.getPayments().subscribe((p) => {
       this.payments = p;
       this.applyFilters();
       this.loading = false;
+      this.cdr.detectChanges();
     });
   }
 

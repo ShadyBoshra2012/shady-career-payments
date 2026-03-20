@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
 import { CommonModule, CurrencyPipe, DecimalPipe } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
@@ -182,6 +182,7 @@ import { Payment, GodsMoney, SalaryPayment, DashboardStats } from '../../core/mo
 })
 export class DashboardComponent implements OnInit {
   private dataService = inject(DataService);
+  private cdr = inject(ChangeDetectorRef);
 
   loading = true;
   stats: DashboardStats = {
@@ -234,6 +235,7 @@ export class DashboardComponent implements OnInit {
       this.buildGodPercentChart(payments);
       this.buildYearlyChart(payments);
       this.loading = false;
+      this.cdr.detectChanges();
     });
   }
 

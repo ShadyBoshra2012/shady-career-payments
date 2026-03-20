@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatTableModule } from '@angular/material/table';
 import { MatSortModule, Sort } from '@angular/material/sort';
@@ -96,6 +96,7 @@ import { GodsMoneyDialogComponent } from './gods-money-dialog.component';
 })
 export class GodsMoneyComponent implements OnInit {
   private dataService = inject(DataService);
+  private cdr = inject(ChangeDetectorRef);
   private dialog = inject(MatDialog);
   private snackBar = inject(MatSnackBar);
 
@@ -121,7 +122,9 @@ export class GodsMoneyComponent implements OnInit {
       this.dataService.getPayments().subscribe((payments) => {
         this.totalAccumulated = payments.reduce((s, p) => s + (p.godAmount || 0), 0);
         this.balance = this.totalAccumulated - this.totalDisbursed;
+        this.cdr.detectChanges();
       });
+      this.cdr.detectChanges();
     });
   }
 

@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatTableModule } from '@angular/material/table';
 import { MatSortModule, Sort } from '@angular/material/sort';
@@ -101,6 +101,7 @@ import { SalaryDialogComponent } from './salary-dialog.component';
 })
 export class SalariesComponent implements OnInit {
   private dataService = inject(DataService);
+  private cdr = inject(ChangeDetectorRef);
   private dialog = inject(MatDialog);
   private snackBar = inject(MatSnackBar);
 
@@ -118,6 +119,7 @@ export class SalariesComponent implements OnInit {
     this.dataService.getEmployees().subscribe((emps) => {
       this.employees = emps;
       this.load();
+      this.cdr.detectChanges();
     });
   }
 
@@ -128,6 +130,7 @@ export class SalariesComponent implements OnInit {
         employeeName: this.employees.find((e) => e.id === item.employeeId)?.name || item.employeeName || 'Unknown',
       }));
       this.applyFilter();
+      this.cdr.detectChanges();
     });
   }
 

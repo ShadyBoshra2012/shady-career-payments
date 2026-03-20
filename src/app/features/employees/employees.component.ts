@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatTableModule } from '@angular/material/table';
 import { MatSortModule, Sort } from '@angular/material/sort';
@@ -72,6 +72,7 @@ import { EmployeeDialogComponent } from './employee-dialog.component';
 })
 export class EmployeesComponent implements OnInit {
   private dataService = inject(DataService);
+  private cdr = inject(ChangeDetectorRef);
   private dialog = inject(MatDialog);
   private snackBar = inject(MatSnackBar);
 
@@ -85,6 +86,7 @@ export class EmployeesComponent implements OnInit {
     this.dataService.getEmployees().subscribe((items) => {
       this.items = items;
       this.sortedItems = [...items];
+      this.cdr.detectChanges();
     });
   }
 
