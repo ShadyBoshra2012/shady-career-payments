@@ -52,7 +52,11 @@ function formatSubScope(val) {
     }
     return String(val);
   }
-  return String(val).trim();
+  // If string, strip any URL lines and return the text part
+  const str = String(val).trim();
+  const lines = str.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+  const textLines = lines.filter((l) => !l.match(/^https?:\/\//i));
+  return textLines.join(' ') || lines[0] || str;
 }
 
 // Clean main scope name: extract first line, remove URLs
@@ -210,6 +214,9 @@ async function seedCareerPayments() {
     const godPercentage = receivedEGP > 0 ? Math.round((godAmount / receivedEGP) * 10000) / 100 : 0;
     const date = parseDate(r['Date']);
     const subScope = formatSubScope(r['Sub Scope']);
+
+    // Skip total/summary rows: no sub scope AND no date (these are Excel aggregation rows)
+    if (!subScope && !date) continue;
 
     payments.push({
       mainScopeId: '',
