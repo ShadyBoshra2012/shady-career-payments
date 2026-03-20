@@ -14,7 +14,7 @@ function excelDate(val) {
   return null;
 }
 
-// Parse "Kero = 100 EGP\nEngy = 100 EGP" into structured splits
+// Parse "Name = 100 EGP\nName = 100 EGP" into structured splits
 function parseOthers(str) {
   if (!str || str === '-' || str === 'undefined') return [];
   return String(str)
@@ -62,7 +62,7 @@ async function clearAll() {
 }
 
 async function seedCareerPayments() {
-  const filePath = path.join(__dirname, '..', 'My Career Payments .xlsx');
+  const filePath = path.join(__dirname, '..', 'career-payments.xlsx');
   const wb = XLSX.readFile(filePath);
 
   // --- Payments Sheet ---
@@ -165,7 +165,7 @@ async function seedCareerPayments() {
 }
 
 async function seedSalaries() {
-  const filePath = path.join(__dirname, '..', 'BeLightTech Salaries.xlsx');
+  const filePath = path.join(__dirname, '..', 'salaries.xlsx');
   const wb = XLSX.readFile(filePath);
 
   // --- Overview Sheet (Employees) ---

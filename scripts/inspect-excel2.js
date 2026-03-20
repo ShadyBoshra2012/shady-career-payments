@@ -1,7 +1,7 @@
 const XLSX = require('xlsx');
 const path = require('path');
 
-const wb = XLSX.readFile(path.join(__dirname, '..', 'My Career Payments .xlsx'), { cellDates: true });
+const wb = XLSX.readFile(path.join(__dirname, '..', 'career-payments.xlsx'), { cellDates: true });
 const payments = XLSX.utils.sheet_to_json(wb.Sheets['Payments']);
 
 // Show all rows with their main scope and sub scope context

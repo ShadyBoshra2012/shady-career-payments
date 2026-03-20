@@ -24,7 +24,7 @@ function formatSubScope(val) {
   return String(val).trim();
 }
 
-const filePath = path.join(__dirname, '..', 'My Career Payments .xlsx');
+const filePath = path.join(__dirname, '..', 'career-payments.xlsx');
 const wb = XLSX.readFile(filePath, { cellDates: true });
 const rows = XLSX.utils.sheet_to_json(wb.Sheets['Payments']);
 

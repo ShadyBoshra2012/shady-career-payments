@@ -2,7 +2,7 @@ const XLSX = require('xlsx');
 const path = require('path');
 
 // Career Payments
-const wb1 = XLSX.readFile(path.join(__dirname, '..', 'My Career Payments .xlsx'));
+const wb1 = XLSX.readFile(path.join(__dirname, '..', 'career-payments.xlsx'));
 console.log('=== Career Payments Sheets:', wb1.SheetNames);
 
 const payments = XLSX.utils.sheet_to_json(wb1.Sheets['Payments']);
@@ -77,7 +77,7 @@ dateSamples.slice(0, 20).forEach(s => console.log('  ', s));
 
 // Read with raw: true to see raw cell values
 console.log('\n=== RAW Sub Scope values (first 20 rows with cellDates):');
-const wb2 = XLSX.readFile(path.join(__dirname, '..', 'My Career Payments .xlsx'), { cellDates: true });
+const wb2 = XLSX.readFile(path.join(__dirname, '..', 'career-payments.xlsx'), { cellDates: true });
 const payments2 = XLSX.utils.sheet_to_json(wb2.Sheets['Payments']);
 for (let i = 0; i < Math.min(20, payments2.length); i++) {
   const r = payments2[i];
@@ -96,7 +96,7 @@ console.log('Row count:', gods.length);
 gods.slice(0, 5).forEach(r => console.log(JSON.stringify(r)));
 
 // Salaries
-const wb3 = XLSX.readFile(path.join(__dirname, '..', 'BeLightTech Salaries.xlsx'));
+const wb3 = XLSX.readFile(path.join(__dirname, '..', 'salaries.xlsx'));
 console.log('\n=== Salaries Sheets:', wb3.SheetNames);
 const overview = XLSX.utils.sheet_to_json(wb3.Sheets['Overview']);
 console.log('Overview headers:', Object.keys(overview[0] || {}));

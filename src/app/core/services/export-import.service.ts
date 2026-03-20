@@ -278,7 +278,7 @@ export class ExportImportService {
   }
 
   /**
-   * Seed from the original "My Career Payments .xlsx" file.
+   * Seed from the original career payments Excel file.
    * Sheet "Payments" has columns: #, MainScope, SubScope, ReceivedEGP, MineEGP, Other, God, God%, Total, Date
    * Sheet "GODs Money" has columns: #, Responsible To, Title, Description, Price EGP, Proof, Sending Date, Execution Date
    */
@@ -371,7 +371,7 @@ export class ExportImportService {
   }
 
   /**
-   * Seed from the original "BeLightTech Salaries.xlsx" file.
+   * Seed from the original salaries Excel file.
    * Sheet "Overview" has columns: #, Name, Position, Salary, Weekend, Method, Account
    * Sheet "20242025 Accumulative" has salary payment rows
    */

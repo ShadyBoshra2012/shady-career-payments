@@ -49,3 +49,8 @@ Thumbs.db
 # Excel data files
 *.xlsx
 .vscode/mcp.json
+
+# Environment secrets
+.env*
+serviceAccountKey*.json
+*-service-account*.json
