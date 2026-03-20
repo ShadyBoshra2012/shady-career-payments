@@ -127,7 +127,7 @@ interface ProjectGroup {
             </mat-expansion-panel-header>
 
             <div class="table-container">
-              <table mat-table [dataSource]="group.payments">
+              <table mat-table [dataSource]="group.payments" multiTemplateDataRows>
                 <ng-container matColumnDef="subScope">
                   <th mat-header-cell *matHeaderCellDef>Sub Scope</th>
                   <td mat-cell *matCellDef="let p">{{ p.subScope }}</td>
@@ -152,6 +152,19 @@ interface ProjectGroup {
                   <th mat-header-cell *matHeaderCellDef>God %</th>
                   <td mat-cell *matCellDef="let p" class="num-cell">{{ p.godPercentage | number:'1.1-1' }}%</td>
                 </ng-container>
+                <ng-container matColumnDef="splits">
+                  <th mat-header-cell *matHeaderCellDef>Splits</th>
+                  <td mat-cell *matCellDef="let p">
+                    @if (p.others?.length) {
+                      <button mat-button class="splits-badge" (click)="toggleRow(p); $event.stopPropagation()">
+                        <mat-icon class="splits-icon">people</mat-icon>
+                        {{ p.others.length }}
+                      </button>
+                    } @else {
+                      <span class="no-splits">&mdash;</span>
+                    }
+                  </td>
+                </ng-container>
                 <ng-container matColumnDef="actions">
                   <th mat-header-cell *matHeaderCellDef></th>
                   <td mat-cell *matCellDef="let p">
@@ -164,8 +177,39 @@ interface ProjectGroup {
                   </td>
                 </ng-container>
 
+                <!-- Expanded detail row -->
+                <ng-container matColumnDef="expandedDetail">
+                  <td mat-cell *matCellDef="let p" [attr.colspan]="displayedColumns.length">
+                    @if (expandedPayment === p) {
+                      <div class="split-detail">
+                        <div class="split-detail-header">
+                          <mat-icon>call_split</mat-icon>
+                          <span>Payment Splits</span>
+                          <span class="split-total">Total: {{ getSplitTotal(p) | number:'1.0-0' }} EGP</span>
+                        </div>
+                        <div class="split-items">
+                          @for (split of p.others; track $index) {
+                            <div class="split-item">
+                              <div class="split-person">
+                                <mat-icon class="split-person-icon">person</mat-icon>
+                                <span>{{ split.personName }}</span>
+                              </div>
+                              <span class="split-amount">{{ split.amount | number:'1.0-0' }} EGP</span>
+                            </div>
+                          }
+                        </div>
+                      </div>
+                    }
+                  </td>
+                </ng-container>
+
                 <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-                <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;"
+                    [class.expanded-row]="expandedPayment === row"
+                    [class.has-splits]="row.others?.length"></tr>
+                <tr mat-row *matRowDef="let row; columns: ['expandedDetail']"
+                    class="detail-row"
+                    [class.detail-visible]="expandedPayment === row"></tr>
               </table>
             </div>
           </mat-expansion-panel>
@@ -266,6 +310,63 @@ interface ProjectGroup {
     table { width: 100%; }
     .num-cell { font-variant-numeric: tabular-nums; font-weight: 500; }
 
+    /* Splits badge */
+    .splits-badge {
+      min-width: 0; padding: 2px 10px; border-radius: 8px;
+      font-size: 12px; font-weight: 600; line-height: 1;
+      background: rgba(124, 58, 237, 0.08); color: #7c3aed;
+    }
+    .splits-icon {
+      font-size: 16px; width: 16px; height: 16px; margin-right: 4px;
+    }
+    .no-splits { color: var(--text-muted); }
+
+    /* Expandable detail row */
+    .detail-row { height: 0; }
+    .detail-row td { padding: 0 !important; border-bottom-width: 0 !important; }
+    .detail-visible td { border-bottom-width: 1px !important; }
+    .expanded-row { font-weight: 500; }
+    .has-splits { cursor: pointer; }
+
+    .split-detail {
+      padding: 12px 16px 16px;
+      background: var(--surface);
+      border-radius: 0 0 var(--radius-md) var(--radius-md);
+    }
+    .split-detail-header {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 13px; font-weight: 600; color: var(--text-primary);
+      margin-bottom: 10px;
+    }
+    .split-detail-header mat-icon {
+      font-size: 18px; width: 18px; height: 18px; color: #7c3aed;
+    }
+    .split-total {
+      margin-left: auto; font-size: 12px; font-weight: 700;
+      color: #7c3aed; background: rgba(124, 58, 237, 0.08);
+      padding: 3px 10px; border-radius: 6px;
+    }
+    .split-items {
+      display: flex; flex-direction: column; gap: 6px;
+    }
+    .split-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 12px; border-radius: 8px;
+      background: #fff; border: 1px solid var(--border);
+    }
+    .split-person {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 13px; font-weight: 500; color: var(--text-primary);
+    }
+    .split-person-icon {
+      font-size: 18px; width: 18px; height: 18px;
+      color: var(--text-muted);
+    }
+    .split-amount {
+      font-size: 13px; font-weight: 600; color: var(--text-primary);
+      font-variant-numeric: tabular-nums;
+    }
+
     @media (max-width: 599px) {
       .page-intro { flex-direction: column; align-items: flex-start; }
       .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
@@ -287,7 +388,8 @@ export class PaymentsComponent implements OnInit {
   mainScopes: MainScope[] = [];
   projectGroups: ProjectGroup[] = [];
 
-  displayedColumns = ['subScope', 'date', 'receivedEGP', 'mineEGP', 'godAmount', 'godPercentage', 'actions'];
+  displayedColumns = ['subScope', 'date', 'receivedEGP', 'mineEGP', 'godAmount', 'godPercentage', 'splits', 'actions'];
+  expandedPayment: Payment | null = null;
   filterText = '';
 
   totalReceived = 0;
@@ -344,6 +446,14 @@ export class PaymentsComponent implements OnInit {
         count: payments.length,
       }))
       .sort((a, b) => b.totalReceived - a.totalReceived);
+  }
+
+  toggleRow(payment: Payment) {
+    this.expandedPayment = this.expandedPayment === payment ? null : payment;
+  }
+
+  getSplitTotal(payment: Payment): number {
+    return (payment.others || []).reduce((s, o) => s + (o.amount || 0), 0);
   }
 
   openDialog(payment?: Payment) {

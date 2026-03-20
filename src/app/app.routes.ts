@@ -24,6 +24,11 @@ export const routes: Routes = [
           import('./features/payments/payments.component').then((m) => m.PaymentsComponent),
       },
       {
+        path: 'projects',
+        loadComponent: () =>
+          import('./features/projects/projects.component').then((m) => m.ProjectsComponent),
+      },
+      {
         path: 'gods-money',
         loadComponent: () =>
           import('./features/gods-money/gods-money.component').then((m) => m.GodsMoneyComponent),

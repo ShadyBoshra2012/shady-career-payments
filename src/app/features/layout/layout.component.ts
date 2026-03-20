@@ -219,6 +219,7 @@ export class LayoutComponent {
   navItems = [
     { route: '/dashboard', icon: 'dashboard', label: 'Dashboard' },
     { route: '/payments', icon: 'payments', label: 'Payments' },
+    { route: '/projects', icon: 'business', label: 'Projects' },
     { route: '/gods-money', icon: 'volunteer_activism', label: "God's Money" },
     { route: '/employees', icon: 'people', label: 'Employees' },
     { route: '/salaries', icon: 'paid', label: 'Salaries' },
