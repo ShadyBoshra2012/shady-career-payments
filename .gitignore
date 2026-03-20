@@ -43,6 +43,9 @@ __screenshots__/
 .DS_Store
 Thumbs.db
 
+# Firebase
+.firebase/
+
 # Excel data files
 *.xlsx
 .vscode/mcp.json
