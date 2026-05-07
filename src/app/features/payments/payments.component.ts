@@ -34,6 +34,13 @@ interface ProjectGroup {
   count: number;
 }
 
+type PeriodPreset = 'all-time' | 'last-week' | 'last-month' | 'last-year' | 'year-before' | 'two-years' | 'three-years' | 'custom';
+
+interface DateRange {
+  from: Date;
+  to: Date;
+}
+
 @Component({
   selector: 'app-payments',
   standalone: true,
@@ -64,6 +71,37 @@ interface ProjectGroup {
           <mat-icon matSuffix>search</mat-icon>
         </mat-form-field>
       </div>
+
+      <mat-card class="period-filter-card">
+        <div class="period-filter-row">
+          <mat-form-field appearance="outline" class="period-field">
+            <mat-label>Period</mat-label>
+            <mat-select [value]="selectedPeriod" (selectionChange)="onPeriodChange($event.value)">
+              @for (option of periodOptions; track option.value) {
+                <mat-option [value]="option.value">{{ option.label }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+
+          @if (selectedPeriod === 'custom') {
+            <mat-form-field appearance="outline" class="date-field">
+              <mat-label>From</mat-label>
+              <input matInput [matDatepicker]="fromPicker" [value]="customFromDate" (dateChange)="onCustomFromDateChange($event.value)" />
+              <mat-datepicker-toggle matSuffix [for]="fromPicker"></mat-datepicker-toggle>
+              <mat-datepicker #fromPicker></mat-datepicker>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="date-field">
+              <mat-label>To</mat-label>
+              <input matInput [matDatepicker]="toPicker" [value]="customToDate" (dateChange)="onCustomToDateChange($event.value)" />
+              <mat-datepicker-toggle matSuffix [for]="toPicker"></mat-datepicker-toggle>
+              <mat-datepicker #toPicker></mat-datepicker>
+            </mat-form-field>
+
+            <button mat-flat-button color="primary" (click)="applyPeriodFilter()" [disabled]="!canApplyCustomRange()">Apply</button>
+          }
+        </div>
+      </mat-card>
 
       <div class="stats-grid">
         <div class="stat-card received">
@@ -240,6 +278,26 @@ interface ProjectGroup {
     .search-row { margin-bottom: 16px; }
     .filter-field { width: 100%; }
 
+    .period-filter-card {
+      margin-bottom: 16px;
+      padding: 16px 20px 0 !important;
+      border-radius: var(--radius-lg);
+    }
+    .period-filter-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+    }
+    .period-field {
+      width: 240px;
+      max-width: 100%;
+    }
+    .date-field {
+      width: 200px;
+      max-width: 100%;
+    }
+
     /* ---- Summary stat cards ---- */
     .stats-grid {
       display: grid;
@@ -370,6 +428,13 @@ interface ProjectGroup {
 
     @media (max-width: 599px) {
       .page-intro { flex-direction: column; align-items: flex-start; }
+      .period-filter-card {
+        padding: 12px 12px 0 !important;
+      }
+      .period-field,
+      .date-field {
+        width: 100%;
+      }
       .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
       .stat-value { font-size: 18px; }
       .stat-card { padding: 14px; }
@@ -386,6 +451,21 @@ export class PaymentsComponent implements OnInit {
   private snackBar = inject(MatSnackBar);
 
   loading = true;
+  periodOptions: Array<{ value: PeriodPreset; label: string }> = [
+    { value: 'all-time', label: 'All the time' },
+    { value: 'last-week', label: 'Last Week' },
+    { value: 'last-month', label: 'Last Month' },
+    { value: 'last-year', label: 'Last Year' },
+    { value: 'year-before', label: 'Year Before' },
+    { value: 'two-years', label: '2 Years' },
+    { value: 'three-years', label: '3 Years' },
+    { value: 'custom', label: 'Custom Dates' },
+  ];
+  selectedPeriod: PeriodPreset = 'two-years';
+  customFromDate: Date | null = null;
+  customToDate: Date | null = null;
+
+  allPayments: Payment[] = [];
   payments: Payment[] = [];
   mainScopes: MainScope[] = [];
   projectGroups: ProjectGroup[] = [];
@@ -402,11 +482,40 @@ export class PaymentsComponent implements OnInit {
   ngOnInit() {
     this.dataService.getMainScopes().subscribe((s) => { this.mainScopes = s; this.cdr.detectChanges(); });
     this.dataService.getPayments().subscribe((p) => {
-      this.payments = p;
-      this.buildGroups();
+      this.allPayments = p;
+      this.applyPeriodFilter();
       this.loading = false;
       this.cdr.detectChanges();
     });
+  }
+
+  onPeriodChange(period: PeriodPreset) {
+    this.selectedPeriod = period;
+    if (period !== 'custom') {
+      this.applyPeriodFilter();
+    }
+  }
+
+  onCustomFromDateChange(date: Date | null) {
+    this.customFromDate = date;
+  }
+
+  onCustomToDateChange(date: Date | null) {
+    this.customToDate = date;
+  }
+
+  canApplyCustomRange(): boolean {
+    if (!this.customFromDate || !this.customToDate) {
+      return false;
+    }
+    return this.startOfDay(this.customFromDate) <= this.endOfDay(this.customToDate);
+  }
+
+  applyPeriodFilter() {
+    const range = this.resolveDateRange();
+    this.payments = this.filterByDateRange(this.allPayments, (item) => item.date, range);
+    this.expandedPayment = null;
+    this.buildGroups();
   }
 
   applyFilter(event: Event) {
@@ -490,5 +599,82 @@ export class PaymentsComponent implements OnInit {
     } catch {
       this.snackBar.open('Error deleting payment', 'OK', { duration: 3000 });
     }
+  }
+
+  private resolveDateRange(): DateRange | null {
+    const now = new Date();
+
+    switch (this.selectedPeriod) {
+      case 'all-time':
+        return null;
+      case 'last-week':
+        return { from: this.startOfDay(this.addDays(now, -7)), to: this.endOfDay(now) };
+      case 'last-month':
+        return { from: this.startOfDay(this.addMonths(now, -1)), to: this.endOfDay(now) };
+      case 'last-year':
+        return { from: this.startOfDay(this.addYears(now, -1)), to: this.endOfDay(now) };
+      case 'year-before':
+        return {
+          from: this.startOfDay(this.addYears(now, -2)),
+          to: this.endOfDay(this.addYears(now, -1)),
+        };
+      case 'two-years':
+        return { from: this.startOfDay(this.addYears(now, -2)), to: this.endOfDay(now) };
+      case 'three-years':
+        return { from: this.startOfDay(this.addYears(now, -3)), to: this.endOfDay(now) };
+      case 'custom':
+      default:
+        if (this.customFromDate && this.customToDate) {
+          return {
+            from: this.startOfDay(this.customFromDate),
+            to: this.endOfDay(this.customToDate),
+          };
+        }
+        return { from: this.startOfDay(this.addYears(now, -2)), to: this.endOfDay(now) };
+    }
+  }
+
+  private filterByDateRange<T>(items: T[], getDate: (item: T) => Date | string | undefined, range: DateRange | null): T[] {
+    if (!range) {
+      return [...items];
+    }
+    return items.filter((item) => {
+      const rawDate = getDate(item);
+      if (!rawDate) {
+        return false;
+      }
+      const date = new Date(rawDate);
+      return date >= range.from && date <= range.to;
+    });
+  }
+
+  private startOfDay(date: Date): Date {
+    const d = new Date(date);
+    d.setHours(0, 0, 0, 0);
+    return d;
+  }
+
+  private endOfDay(date: Date): Date {
+    const d = new Date(date);
+    d.setHours(23, 59, 59, 999);
+    return d;
+  }
+
+  private addDays(date: Date, days: number): Date {
+    const d = new Date(date);
+    d.setDate(d.getDate() + days);
+    return d;
+  }
+
+  private addMonths(date: Date, months: number): Date {
+    const d = new Date(date);
+    d.setMonth(d.getMonth() + months);
+    return d;
+  }
+
+  private addYears(date: Date, years: number): Date {
+    const d = new Date(date);
+    d.setFullYear(d.getFullYear() + years);
+    return d;
   }
 }
