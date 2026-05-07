@@ -17,7 +17,7 @@ import { DataService } from '../../core/services/data.service';
 import { AmountVisibilityService } from '../../core/services/amount-visibility.service';
 import { Payment, GodsMoney, SalaryPayment, DashboardStats } from '../../core/models';
 
-type PeriodPreset = 'all-time' | 'last-week' | 'last-month' | 'last-year' | 'year-before' | 'two-years' | 'three-years' | 'custom';
+type PeriodPreset = 'all-time' | 'current-year' | 'last-week' | 'last-month' | 'last-year' | 'year-before' | 'two-years' | 'three-years' | 'custom';
 
 interface DateRange {
   from: Date;
@@ -364,6 +364,7 @@ export class DashboardComponent implements OnInit {
 
   periodOptions: Array<{ value: PeriodPreset; label: string }> = [
     { value: 'all-time', label: 'All the time' },
+    { value: 'current-year', label: 'Current year' },
     { value: 'last-week', label: 'Last Week' },
     { value: 'last-month', label: 'Last Month' },
     { value: 'last-year', label: 'Last Year' },
@@ -511,6 +512,11 @@ export class DashboardComponent implements OnInit {
     switch (this.selectedPeriod) {
       case 'all-time':
         return null;
+      case 'current-year':
+        return {
+          from: this.startOfDay(new Date(now.getFullYear(), 0, 1)),
+          to: this.endOfDay(now),
+        };
       case 'last-week':
         return { from: this.startOfDay(this.addDays(now, -7)), to: this.endOfDay(now) };
       case 'last-month':
