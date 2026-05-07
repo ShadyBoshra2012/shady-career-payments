@@ -59,9 +59,43 @@ interface DateRange {
           <h1>Payments</h1>
           <p>Track all project income and splits</p>
         </div>
-        <button mat-fab extended color="primary" (click)="openDialog()" class="add-btn">
-          <mat-icon>add</mat-icon> New Payment
-        </button>
+
+        <div class="intro-actions">
+          <mat-card class="period-filter-card">
+            <div class="period-filter-row">
+              <mat-form-field appearance="outline" class="period-field">
+                <mat-label>Period</mat-label>
+                <mat-select [value]="selectedPeriod" (selectionChange)="onPeriodChange($event.value)">
+                  @for (option of periodOptions; track option.value) {
+                    <mat-option [value]="option.value">{{ option.label }}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+
+              @if (selectedPeriod === 'custom') {
+                <mat-form-field appearance="outline" class="date-field">
+                  <mat-label>From</mat-label>
+                  <input matInput [matDatepicker]="fromPicker" [value]="customFromDate" (dateChange)="onCustomFromDateChange($event.value)" />
+                  <mat-datepicker-toggle matSuffix [for]="fromPicker"></mat-datepicker-toggle>
+                  <mat-datepicker #fromPicker></mat-datepicker>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="date-field">
+                  <mat-label>To</mat-label>
+                  <input matInput [matDatepicker]="toPicker" [value]="customToDate" (dateChange)="onCustomToDateChange($event.value)" />
+                  <mat-datepicker-toggle matSuffix [for]="toPicker"></mat-datepicker-toggle>
+                  <mat-datepicker #toPicker></mat-datepicker>
+                </mat-form-field>
+
+                <button mat-flat-button color="primary" (click)="applyPeriodFilter()" [disabled]="!canApplyCustomRange()">Apply</button>
+              }
+            </div>
+          </mat-card>
+
+          <button mat-fab extended color="primary" (click)="openDialog()" class="add-btn">
+            <mat-icon>add</mat-icon> New Payment
+          </button>
+        </div>
       </div>
 
       <div class="search-row">
@@ -71,37 +105,6 @@ interface DateRange {
           <mat-icon matSuffix>search</mat-icon>
         </mat-form-field>
       </div>
-
-      <mat-card class="period-filter-card">
-        <div class="period-filter-row">
-          <mat-form-field appearance="outline" class="period-field">
-            <mat-label>Period</mat-label>
-            <mat-select [value]="selectedPeriod" (selectionChange)="onPeriodChange($event.value)">
-              @for (option of periodOptions; track option.value) {
-                <mat-option [value]="option.value">{{ option.label }}</mat-option>
-              }
-            </mat-select>
-          </mat-form-field>
-
-          @if (selectedPeriod === 'custom') {
-            <mat-form-field appearance="outline" class="date-field">
-              <mat-label>From</mat-label>
-              <input matInput [matDatepicker]="fromPicker" [value]="customFromDate" (dateChange)="onCustomFromDateChange($event.value)" />
-              <mat-datepicker-toggle matSuffix [for]="fromPicker"></mat-datepicker-toggle>
-              <mat-datepicker #fromPicker></mat-datepicker>
-            </mat-form-field>
-
-            <mat-form-field appearance="outline" class="date-field">
-              <mat-label>To</mat-label>
-              <input matInput [matDatepicker]="toPicker" [value]="customToDate" (dateChange)="onCustomToDateChange($event.value)" />
-              <mat-datepicker-toggle matSuffix [for]="toPicker"></mat-datepicker-toggle>
-              <mat-datepicker #toPicker></mat-datepicker>
-            </mat-form-field>
-
-            <button mat-flat-button color="primary" (click)="applyPeriodFilter()" [disabled]="!canApplyCustomRange()">Apply</button>
-          }
-        </div>
-      </mat-card>
 
       <div class="stats-grid">
         <div class="stat-card received">
@@ -275,19 +278,30 @@ interface DateRange {
       font-weight: 600 !important;
     }
 
+    .intro-actions {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 10px;
+    }
+
     .search-row { margin-bottom: 16px; }
     .filter-field { width: 100%; }
 
     .period-filter-card {
-      margin-bottom: 16px;
-      padding: 16px 20px 0 !important;
+      margin-bottom: 0;
+      padding: 12px 14px 0 !important;
       border-radius: var(--radius-lg);
+      border: 1px solid rgba(67, 97, 238, 0.18);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(246, 249, 255, 0.95) 100%);
+      box-shadow: 0 12px 24px rgba(31, 41, 55, 0.08);
     }
     .period-filter-row {
       display: flex;
       flex-wrap: wrap;
       gap: 12px;
       align-items: center;
+      justify-content: flex-end;
     }
     .period-field {
       width: 240px;
@@ -428,12 +442,22 @@ interface DateRange {
 
     @media (max-width: 599px) {
       .page-intro { flex-direction: column; align-items: flex-start; }
+      .intro-actions {
+        width: 100%;
+        align-items: stretch;
+      }
+      .add-btn {
+        align-self: flex-start;
+      }
       .period-filter-card {
         padding: 12px 12px 0 !important;
       }
       .period-field,
       .date-field {
         width: 100%;
+      }
+      .period-filter-row {
+        justify-content: stretch;
       }
       .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
       .stat-value { font-size: 18px; }
