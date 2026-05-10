@@ -96,18 +96,28 @@ export class FirestoreService {
     const result: Record<string, unknown> = {};
     for (const key of Object.keys(obj)) {
       const val = obj[key];
+      if (typeof val === 'undefined') {
+        continue;
+      }
       if (val instanceof Date) {
         result[key] = Timestamp.fromDate(val);
       } else if (val && typeof val === 'object' && !Array.isArray(val) && !(val instanceof Timestamp)) {
         result[key] = this.convertDatesToTimestamps(val as Record<string, unknown>);
       } else if (Array.isArray(val)) {
-        result[key] = val.map((item) =>
-          item instanceof Date
-            ? Timestamp.fromDate(item)
-            : item && typeof item === 'object'
-              ? this.convertDatesToTimestamps(item as Record<string, unknown>)
-              : item
-        );
+        result[key] = val
+          .map((item) => {
+            if (typeof item === 'undefined') {
+              return undefined;
+            }
+            if (item instanceof Date) {
+              return Timestamp.fromDate(item);
+            }
+            if (item && typeof item === 'object') {
+              return this.convertDatesToTimestamps(item as Record<string, unknown>);
+            }
+            return item;
+          })
+          .filter((item) => typeof item !== 'undefined');
       } else {
         result[key] = val;
       }

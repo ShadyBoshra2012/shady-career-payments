@@ -562,8 +562,10 @@ export class ProjectOpsComponent implements OnInit {
           await this.dataService.addOpsProject(result);
           this.snackBar.open('Ops project added', 'OK', { duration: 2200 });
         }
-      } catch {
-        this.snackBar.open('Error saving ops project', 'OK', { duration: 3200 });
+      } catch (error) {
+        console.error('Error saving ops project', error);
+        const message = error instanceof Error ? error.message : 'Unknown error';
+        this.snackBar.open(`Error saving ops project: ${message}`, 'OK', { duration: 4500 });
       }
     });
   }
@@ -576,8 +578,10 @@ export class ProjectOpsComponent implements OnInit {
     try {
       await this.dataService.deleteOpsProject(project.id);
       this.snackBar.open('Ops project deleted', 'OK', { duration: 2200 });
-    } catch {
-      this.snackBar.open('Error deleting ops project', 'OK', { duration: 3200 });
+    } catch (error) {
+      console.error('Error deleting ops project', error);
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      this.snackBar.open(`Error deleting ops project: ${message}`, 'OK', { duration: 4500 });
     }
   }
 
