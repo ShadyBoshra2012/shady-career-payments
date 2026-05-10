@@ -8,6 +8,7 @@ import {
   Employee,
   SalaryPayment,
   DashboardStats,
+  OpsProject,
 } from '../models';
 
 @Injectable({ providedIn: 'root' })
@@ -132,6 +133,30 @@ export class DataService {
 
   async deleteSalaryPayment(id: string): Promise<void> {
     return this.fs.deleteDocument(`salaryPayments/${id}`);
+  }
+
+  // Operations Projects (upcoming/running)
+  getOpsProjects(): Observable<OpsProject[]> {
+    return this.fs.getCollection<OpsProject>('opsProjects', 'updatedAt');
+  }
+
+  async addOpsProject(data: Partial<OpsProject>): Promise<string> {
+    return this.fs.addDocument('opsProjects', {
+      ...data,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    } as Record<string, unknown>);
+  }
+
+  async updateOpsProject(id: string, data: Partial<OpsProject>): Promise<void> {
+    return this.fs.updateDocument(`opsProjects/${id}`, {
+      ...data,
+      updatedAt: new Date(),
+    } as Record<string, unknown>);
+  }
+
+  async deleteOpsProject(id: string): Promise<void> {
+    return this.fs.deleteDocument(`opsProjects/${id}`);
   }
 
   // Dashboard Stats
